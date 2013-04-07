@@ -2,8 +2,7 @@ package main
 
 import (
 	"code.google.com/p/gorest"
-	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
+	Authenticate "msgstory/authenticate"
 	Register "msgstory/register"
 	User "msgstory/user"
 	"net/http"
@@ -24,6 +23,7 @@ type MsgService struct {
 	gorest.RestService `root:"/getmessage/"`
 
 	getMessage gorest.EndPoint `method:"GET" path:"/get-message" output:"string"`
+	getLogin   gorest.EndPoint `method:"GET" path:"/login" output:"string"`
 }
 
 type RegisterService struct {
@@ -41,23 +41,12 @@ func (serv MsgService) GetMessage() string {
 	return "Welcome to Message Story"
 }
 
+func (serv MsgService) GetLogin() string {
+	return Authenticate.Login()
+}
+
 func (serv UserService) GetUser(name string) string {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	session.SetMode(mgo.Monotonic, true)
-
-	c := session.DB("msgme").C("users")
-
-	result := User.GetUser()
-	err = c.Find(bson.M{"firstName": "Jasdeep1"}).One(&result)
-	if err != nil {
-		panic(err)
-	}
-
-	return result.Email
+	return User.GetUser(name)
 
 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	// return

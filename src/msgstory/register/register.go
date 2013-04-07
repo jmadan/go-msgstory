@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
-	User "msgstory/user"
 )
 
 func Register(useremail, password string) {
@@ -24,13 +22,12 @@ func Register(useremail, password string) {
 	_, err = stmtIns.Exec(useremail, password)
 	if err != nil {
 		panic(err.Error())
-	} 
-	else{
-		createPerson(useremail,password)
+	} else {
+		createPerson(useremail)
 	}
 }
 
-func createPerson(userEmail){
+func createPerson(userEmail string) {
 	mdb, err := mgo.Dial("localhost")
 	if err != nil {
 		panic(err.Error())
@@ -38,11 +35,13 @@ func createPerson(userEmail){
 
 	mdb.SetMode(mgo.Monotonic, true)
 
-	c := mdb.DB("msgme").C("jove")
-	jove:=User.GetUser()
-	// err = c.Find(bson.M{"firstName": "Jasdeep1"}).One(&result)
-	_, err = c.Insert(&jove{nil, nil, userEmail})
-	if err != nil {
-		panic(err)
-	}
+	// person := User{}
+
+	// c := mdb.DB("msgme").C("jove")
+	// jove := User.M
+	// // err = c.Find(bson.M{"firstName": "Jasdeep1"}).One(&result)
+	// err = c.Insert(&jove{nil, nil, userEmail})
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
