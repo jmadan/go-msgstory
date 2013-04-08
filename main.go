@@ -2,6 +2,7 @@ package main
 
 import (
 	"code.google.com/p/gorest"
+	"encoding/json"
 	Authenticate "msgstory/authenticate"
 	Register "msgstory/register"
 	User "msgstory/user"
@@ -11,6 +12,10 @@ import (
 type person struct {
 	Name  string
 	Email string
+}
+
+type testMessage struct {
+	Msg string
 }
 
 type AppService struct {
@@ -43,7 +48,15 @@ func (serv RegisterService) CreateUser(uemail, pass string) string {
 }
 
 func (serv MsgService) GetMessage() string {
-	return "Welcome to Message Story"
+	m := testMessage{"here it is!"}
+
+	b, err := json.Marshal(m)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(b)
 }
 
 func (serv MsgService) GetLogin() string {
@@ -55,6 +68,18 @@ func (serv UserService) GetUser(name string) string {
 
 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	// return
+}
+
+func (serv AppService) GetApp() string {
+	m := testMessage{"Welcome to Message Story"}
+
+	b, err := json.Marshal(m)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(b)
 }
 
 func main() {
