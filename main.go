@@ -8,6 +8,7 @@ import (
 	Register "msgstory/register"
 	User "msgstory/user"
 	"net/http"
+	"strings"
 )
 
 type person struct {
@@ -17,11 +18,6 @@ type person struct {
 
 type testMessage struct {
 	Msg string
-}
-
-type authenticate struct {
-	InputEmail    string
-	InputPassword string
 }
 
 type AppService struct {
@@ -42,18 +38,26 @@ type MsgService struct {
 	getLogin           gorest.EndPoint `method:"GET" path:"/login" output:"string"`
 }
 
-type RegisterService struct {
+type AuthenticateService struct {
 	gorest.RestService `root:"/"`
 	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
 	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 }
 
-func (serv RegisterService) RegisterUser(posted string) {
-	fmt.Println(posted)
-	fmt.Println("I am here to register!!!")
+func (serv AuthenticateService) RegisterUser(posted string) {
+	var str []string
+	var dude string
+	str = strings.Split(posted, "&")
+	useremail := strings.SplitAfter(str[0], "=")
+	password := strings.SplitAfter(str[1], "=")
+	msg := Authenticate.Login(useremail[1], password[1])
+	if msg == "Logged In" {
+		dude = User.GetUserByEmail(useremail[1])
+	}
+	fmt.Println(dude)
 }
 
-func (serv RegisterService) CreateUser(uemail, pass string) string {
+func (serv AuthenticateService) CreateUser(uemail, pass string) string {
 	Register.Register(uemail, pass)
 	return "Executed!!!"
 }
@@ -71,7 +75,8 @@ func (serv MsgService) GetMessage() string {
 }
 
 func (serv MsgService) GetLogin() string {
-	return Authenticate.Login()
+	return "Bazinga"
+	// return Authenticate.Login()
 }
 
 func (serv UserService) GetUser() string {
@@ -108,9 +113,9 @@ func main() {
 	gorest.RegisterService(new(AppService))
 	gorest.RegisterService(new(UserService))
 	gorest.RegisterService(new(MsgService))
-	gorest.RegisterService(new(RegisterService))
+	gorest.RegisterService(new(AuthenticateService))
 	http.Handle("/", gorest.Handle())
-	http.HandleFunc("/tempurl", getData)
+	// http.HandleFunc("/tempurl", getData)
 	http.ListenAndServe(":8080", nil)
 	// User.GetAll()
 }
