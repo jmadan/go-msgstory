@@ -55,6 +55,27 @@ func GetUser(name string) string {
 	// return
 }
 
+func GetUserByEmail(email string) string {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("msgme").C("jove")
+
+	result := User{}
+	err = c.Find(bson.M{"email": email}).One(&result)
+	if err != nil {
+		panic(err)
+	}
+	js, _ := json.Marshal(result)
+	// fmt.Printf("%s", js)
+	return string(js)
+	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	// return
+}
+
 func GetAll() string {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
