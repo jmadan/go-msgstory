@@ -3,6 +3,7 @@ package authenticate
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	// User "msgstory/user"
 )
 
 type Authenticate struct {
@@ -41,7 +42,7 @@ func (a *Authenticate) Authorize(useremail, userpassword string) string {
 	return msg
 }
 
-func Login() string {
+func Login(email, password string) string {
 	a := Authenticate{"", "", false}
-	return a.Authorize("jasdeepm@gmail.com", "98036054")
+	return a.Authorize(email, password)
 }
