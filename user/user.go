@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	// GeoLocation "msgstory/geolocation"
 )
 
 type name struct {
@@ -19,19 +20,45 @@ type message struct {
 }
 
 type User struct {
-	Name     name      `json:"name" bson:"name"`
-	Age      string    `json:"age" bson:"age"`
-	Email    string    `json:"email" bson:"email"`
-	Handle   string    `json:"handle" bson:"handle"`
-	Messages []message `json:"messages" bson:"messages"`
+	Name        name      `json:"name" bson:"name"`
+	Age         string    `json:"age" bson:"age"`
+	Email       string    `json:"email" bson:"email"`
+	Handle      string    `json:"handle" bson:"handle"`
+	Messages    []message `json:"messages" bson:"messages"`
+	PhoneNumber string    `json:"phone" bson:"phone"`
 }
 
 type JSONUser struct {
-	Name     name      `json:"name" bson:"name"`
-	Age      string    `json:"age" bson:"age"`
-	Email    string    `json:"email" bson:"email"`
-	Handle   string    `json:"handle" bson:"handle"`
-	Messages []message `json:"messages" bson:"messages"`
+	Name        name      `json:"name" bson:"name"`
+	Age         string    `json:"age" bson:"age"`
+	Email       string    `json:"email" bson:"email"`
+	Handle      string    `json:"handle" bson:"handle"`
+	Messages    []message `json:"messages" bson:"messages"`
+	PhoneNumber string    `json:"phone" bson:"phone"`
+}
+
+func (u *User) GetName() string {
+	return u.Name.Firstname + " " + u.Name.Lastname
+}
+
+func (u *User) GetEmail() string {
+	return u.Email
+}
+
+func (u *User) GetHandle() string {
+	return u.Handle
+}
+
+func (u *User) GetMessages() string {
+	str, err := json.Marshal(u.Messages)
+	if err != nil {
+		fmt.Println("what the fuck!")
+	}
+	return string(str)
+}
+
+func NewUser() User {
+	return User{}
 }
 
 func GetUser(name string) string {
@@ -118,13 +145,14 @@ func CreateUser(user string) {
 }
 
 // func (user User) MarshalJSON() ([]byte, error) {
-func (user User) MarshalJSON() {
+func (user *User) MarshalJSON() {
 	jsonUser := JSONUser{
 		user.Name,
 		user.Age,
 		user.Email,
 		user.Handle,
 		user.Messages,
+		user.PhoneNumber,
 	}
 	json.Marshal(jsonUser)
 	// fmt.Println(len(st))
