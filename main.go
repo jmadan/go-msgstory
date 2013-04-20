@@ -4,7 +4,11 @@ import (
 	"code.google.com/p/gorest"
 	"encoding/json"
 	"fmt"
+	// "log"
 	Authenticate "msgstory/authenticate"
+	Circle "msgstory/circle"
+	GeoLocation "msgstory/geolocation"
+	Mesiji "msgstory/message"
 	Register "msgstory/register"
 	User "msgstory/user"
 	"net/http"
@@ -33,9 +37,10 @@ type UserService struct {
 }
 
 type MsgService struct {
-	gorest.RestService `root:"/getmessage/"`
-	getMessage         gorest.EndPoint `method:"GET" path:"/get-message" output:"string"`
+	gorest.RestService `root:"/message/" consumes:"application/json" produces:"application/json"`
+	getMessage         gorest.EndPoint `method:"GET" path:"/getmessage" output:"string"`
 	getLogin           gorest.EndPoint `method:"GET" path:"/login" output:"string"`
+	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
 }
 
 type AuthenticateService struct {
@@ -44,6 +49,34 @@ type AuthenticateService struct {
 	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 }
 
+type CircleService struct {
+	gorest.RestService `root:"/circle"`
+	createCircle       gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
+}
+
+type LocationService struct {
+	gorest.RestService `root:"/locations/"`
+	getLocations       gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
+}
+
+// ************Location Service Methods ***********
+func (serv LocationService) GetLocations(place string) string {
+	str := GeoLocation.GetNearVenues(place)
+	for i := range str {
+		fmt.Println(str[i])
+	}
+	return "done"
+}
+
+//*************Circle Service Methods ***************
+func (serv CircleService) CreateCircle(posted string) {
+	var str []string
+	str = strings.Split(posted, "=")
+	msg := Circle.CreateCircle(str[1], "")
+	fmt.Println(msg)
+}
+
+//*************Authentication Service Methods ***************
 func (serv AuthenticateService) RegisterUser(posted string) {
 	var str []string
 	var dude string
@@ -53,6 +86,7 @@ func (serv AuthenticateService) RegisterUser(posted string) {
 	msg := Authenticate.Login(useremail[1], password[1])
 	if msg == "Logged In" {
 		dude = User.GetUserByEmail(useremail[1])
+		// log.Println(dude.Name + "logged in successfully")
 	}
 	fmt.Println(dude)
 }
@@ -62,15 +96,13 @@ func (serv AuthenticateService) CreateUser(uemail, pass string) string {
 	return "Executed!!!"
 }
 
+//*************Message Service Methods ***************
 func (serv MsgService) GetMessage() string {
 	m := testMessage{"here it is!"}
-
 	b, err := json.Marshal(m)
-
 	if err != nil {
 		return err.Error()
 	}
-
 	return string(b)
 }
 
@@ -79,6 +111,11 @@ func (serv MsgService) GetLogin() string {
 	// return Authenticate.Login()
 }
 
+func (serv MsgService) PostMessage(posted string) {
+	Mesiji.PostIt(posted)
+}
+
+//*************User Service Methods ***************
 func (serv UserService) GetUser() string {
 	per := "{User:[" + User.GetUser("asd") + "]}"
 	return per
@@ -92,16 +129,13 @@ func (serv UserService) GetAll() string {
 	return per
 }
 
+//*************App Service Methods ***************
 func (serv AppService) GetApp() string {
-
 	m := testMessage{"Welcome to Message Story"}
-
 	b, err := json.Marshal(m)
-
 	if err != nil {
 		return err.Error()
 	}
-
 	return string(b)
 }
 
@@ -114,6 +148,8 @@ func main() {
 	gorest.RegisterService(new(UserService))
 	gorest.RegisterService(new(MsgService))
 	gorest.RegisterService(new(AuthenticateService))
+	gorest.RegisterService(new(CircleService))
+	gorest.RegisterService(new(LocationService))
 	http.Handle("/", gorest.Handle())
 	// http.HandleFunc("/tempurl", getData)
 	http.ListenAndServe(":8080", nil)
