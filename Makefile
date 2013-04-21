@@ -1,4 +1,6 @@
 
+$GOPATH = $(GOPATH)/jmadan/go-msgstory
+
 before_install:
 	echo $(GOPATH)
 
