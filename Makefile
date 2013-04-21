@@ -1,5 +1,7 @@
+PATH = $(PATH):$GOPATH
+
 all:
-	go install
+	go build
 
 main:
 	go build main.go
