@@ -1,6 +1,9 @@
-PATH = $(PATH):$GOPATH
+
+before_install:
+	echo $(GOPATH)
 
 all:
+	echo $(PWD)
 	go build
 
 main:
