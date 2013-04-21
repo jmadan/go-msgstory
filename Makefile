@@ -1,5 +1,4 @@
 all:
-	go build
 	go install
 
 main:
