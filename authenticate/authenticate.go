@@ -3,46 +3,53 @@ package authenticate
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	// User "msgstory/user"
+	"log"
+	User "msgstory/user"
 )
 
 type Authenticate struct {
-	email   string
-	user_id string
-	auth    bool
+	email    string
+	password string
+	user_id  string
+	auth     bool
 }
 
-func (a *Authenticate) Authorize(useremail, userpassword string) string {
+func (a *Authenticate) Authorize() user {
+	var json_user, response string
+	var person User.User
+
 	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 	defer db.Close()
 
 	stmtOut, err := db.Prepare("SELECT USER_ID, USEREMAIL FROM USERS WHERE USEREMAIL = ? AND PASSWORD = ?")
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 	defer stmtOut.Close()
 
 	// authorize := Authenticate{nil, nil, false}
 	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
-	err = stmtOut.QueryRow(useremail, userpassword).Scan(&a.email, &a.user_id)
+	err = stmtOut.QueryRow(a.email, a.password).Scan(&a.email, &a.user_id)
 
 	if err != nil {
-		panic(err.Error())
+		log.Print(err.Error())
+		response = "Not found"
+		log.Print(response)
 	} else {
 		a.auth = true
-	}
-	msg := "Not found"
-	if a.auth {
-		msg = "Logged In"
+		response = "Logged In"
+		person.Email = a.email
+		json_user = person.GetByEmail()
 	}
 
-	return msg
+	return response
 }
 
-func Login(email, password string) string {
-	a := Authenticate{"", "", false}
-	return a.Authorize(email, password)
+func Login(email, password string) s {
+	a := Authenticate{email, password, "", false}
+	res := a.Authorize()
+	return res
 }
