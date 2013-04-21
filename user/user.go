@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
 	// GeoLocation "msgstory/geolocation"
 )
 
 type name struct {
-	Firstname string `json:"firstname" bson:"firstname"`
-	Lastname  string `json:"lastname" bson:"lastname"`
+	Fullname string `json:"fullname" bson:"fullname"`
 }
 
 type message struct {
@@ -20,8 +20,8 @@ type message struct {
 }
 
 type User struct {
-	Name        name      `json:"name" bson:"name"`
-	Age         string    `json:"age" bson:"age"`
+	Name        string    `json:"name" bson:"name"`
+	Age         int       `json:"age" bson:"age"`
 	Email       string    `json:"email" bson:"email"`
 	Handle      string    `json:"handle" bson:"handle"`
 	Messages    []message `json:"messages" bson:"messages"`
@@ -29,8 +29,8 @@ type User struct {
 }
 
 type JSONUser struct {
-	Name        name      `json:"name" bson:"name"`
-	Age         string    `json:"age" bson:"age"`
+	Name        string    `json:"name" bson:"name"`
+	Age         int       `json:"age" bson:"age"`
 	Email       string    `json:"email" bson:"email"`
 	Handle      string    `json:"handle" bson:"handle"`
 	Messages    []message `json:"messages" bson:"messages"`
@@ -38,7 +38,7 @@ type JSONUser struct {
 }
 
 func (u *User) GetName() string {
-	return u.Name.Firstname + " " + u.Name.Lastname
+	return u.Name
 }
 
 func (u *User) GetEmail() string {
@@ -55,10 +55,6 @@ func (u *User) GetMessages() string {
 		fmt.Println("what the fuck!")
 	}
 	return string(str)
-}
-
-func NewUser() User {
-	return User{}
 }
 
 func GetUser(name string) string {
@@ -82,26 +78,26 @@ func GetUser(name string) string {
 	// return
 }
 
-func GetUserByEmail(email string) string {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err.Error())
-	}
+// func GetUserByEmail(email string) string {
+// 	session, err := mgo.Dial("localhost")
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
 
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("jove")
+// 	session.SetMode(mgo.Monotonic, true)
+// 	c := session.DB("msgme").C("jove")
 
-	result := User{}
-	err = c.Find(bson.M{"email": email}).One(&result)
-	if err != nil {
-		panic(err)
-	}
-	js, _ := json.Marshal(result)
-	// fmt.Printf("%s", js)
-	return string(js)
-	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-	// return
-}
+// 	result := User{}
+// 	err = c.Find(bson.M{"email": email}).One(&result)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	js, _ := json.Marshal(result)
+// 	// fmt.Printf("%s", js)
+// 	return string(js)
+// 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+// 	// return
+// }
 
 func GetAll() string {
 	session, err := mgo.Dial("localhost")
@@ -121,39 +117,94 @@ func GetAll() string {
 	return "hello"
 }
 
-func CreateUser(user string) {
+// func CreateUser(user string) {
 
+// 	session, err := mgo.Dial("localhost")
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
+
+// 	session.SetMode(mgo.Monotonic, true)
+// 	c := session.DB("msgme").C("jove")
+
+// 	newUser := User{}
+// 	err = json.Unmarshal([]byte(user), &newUser)
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
+
+// 	err = c.Insert(newUser)
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
+// 	fmt.Print("hello")
+// }
+
+// func (user User) MarshalJSON() ([]byte, error) {
+func (u *User) MarshalJSON() ([]byte, error) {
+	jsonUser := JSONUser{
+		u.Name,
+		u.Age,
+		u.Email,
+		u.Handle,
+		u.Messages,
+		u.PhoneNumber,
+	}
+	return json.Marshal(jsonUser)
+}
+
+func (u *User) GetByEmail() User {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("msgme").C("jove")
 
-	newUser := User{}
-	err = json.Unmarshal([]byte(user), &newUser)
+	result := User{}
+	err = c.Find(bson.M{"email": u.Email}).One(&result)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 
-	err = c.Insert(newUser)
-	if err != nil {
-		panic(err.Error())
-	}
-	fmt.Print("hello")
+	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	return result
 }
 
-// func (user User) MarshalJSON() ([]byte, error) {
-func (user *User) MarshalJSON() {
-	jsonUser := JSONUser{
-		user.Name,
-		user.Age,
-		user.Email,
-		user.Handle,
-		user.Messages,
-		user.PhoneNumber,
+func (u *User) GetByHandle() User {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		log.Fatal(err.Error())
 	}
-	json.Marshal(jsonUser)
-	// fmt.Println(len(st))
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("msgme").C("jove")
+
+	result := User{}
+	err = c.Find(bson.M{"handle": u.Handle}).One(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	// return
+}
+
+func (u *User) CreateUser() bool {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("msgme").C("jove")
+
+	err = c.Insert(u)
+	if err != nil {
+		log.Print(err.Error())
+		return false
+	}
+	return true
 }
