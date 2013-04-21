@@ -1,5 +1,5 @@
 
-$GOPATH = $(GOPATH)/jmadan/go-msgstory
+export $GOPATH = $(GOPATH)/jmadan/go-msgstory
 
 all:
 	go build
