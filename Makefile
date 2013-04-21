@@ -1,11 +1,7 @@
 
 $GOPATH = $(GOPATH)/jmadan/go-msgstory
 
-before_install:
-	echo $(GOPATH)
-
 all:
-	echo $(PWD)
 	go build
 
 main:
