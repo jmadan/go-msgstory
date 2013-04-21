@@ -1,1 +1,3 @@
 language: go
+
+script: go test -v ./message && go test -v ./circle && go test -v ./authentication && go test -v ./user && go test -v ./geolocation && go test -v ./register
