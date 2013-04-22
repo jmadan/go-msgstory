@@ -8,14 +8,13 @@ import (
 )
 
 type Authenticate struct {
-	email    string
-	password string
-	user_id  string
-	auth     bool
+	email           string
+	password        string
+	user_id         string
+	isAuthenticated bool
 }
 
-func (a *Authenticate) Authorize() user {
-	var json_user, response string
+func (a *Authenticate) Authorize() (User.User, Authenticate) {
 	var person User.User
 
 	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
@@ -30,26 +29,25 @@ func (a *Authenticate) Authorize() user {
 	}
 	defer stmtOut.Close()
 
-	// authorize := Authenticate{nil, nil, false}
 	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
-	err = stmtOut.QueryRow(a.email, a.password).Scan(&a.email, &a.user_id)
+
+	err = stmtOut.QueryRow(a.email, a.password).Scan(&a.user_id, &a.email)
 
 	if err != nil {
 		log.Print(err.Error())
-		response = "Not found"
-		log.Print(response)
+		log.Println("Not found")
 	} else {
-		a.auth = true
-		response = "Logged In"
-		person.Email = a.email
-		json_user = person.GetByEmail()
+		a.isAuthenticated = true
+		log.Println("Logged In")
+		person = User.GetByEmail(a.email)
 	}
 
-	return response
+	return person, *a
 }
 
-func Login(email, password string) s {
+func Login(email, password string) User.User {
 	a := Authenticate{email, password, "", false}
-	res := a.Authorize()
+	res, auth := a.Authorize()
+	log.Println(auth.isAuthenticated)
 	return res
 }

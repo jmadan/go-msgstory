@@ -78,27 +78,6 @@ func GetUser(name string) string {
 	// return
 }
 
-// func GetUserByEmail(email string) string {
-// 	session, err := mgo.Dial("localhost")
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("msgme").C("jove")
-
-// 	result := User{}
-// 	err = c.Find(bson.M{"email": email}).One(&result)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	js, _ := json.Marshal(result)
-// 	// fmt.Printf("%s", js)
-// 	return string(js)
-// 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-// 	// return
-// }
-
 func GetAll() string {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
@@ -153,7 +132,7 @@ func (u *User) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jsonUser)
 }
 
-func (u *User) GetByEmail() User {
+func GetByEmail(email string) User {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
 		log.Fatal(err.Error())
@@ -163,7 +142,7 @@ func (u *User) GetByEmail() User {
 	c := session.DB("msgme").C("jove")
 
 	result := User{}
-	err = c.Find(bson.M{"email": u.Email}).One(&result)
+	err = c.Find(bson.M{"email": email}).One(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
