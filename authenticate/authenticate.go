@@ -14,7 +14,8 @@ type Authenticate struct {
 	isAuthenticated bool
 }
 
-func (a *Authenticate) Authorize() (User.User, Authenticate) {
+//private function to verify credentials with MySQL
+func (a *Authenticate) authorize() (User.User, Authenticate) {
 	var person User.User
 
 	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
@@ -45,9 +46,10 @@ func (a *Authenticate) Authorize() (User.User, Authenticate) {
 	return person, *a
 }
 
+//Login function to check users credentials
 func Login(email, password string) User.User {
 	a := Authenticate{email, password, "", false}
-	res, auth := a.Authorize()
+	res, auth := a.authorize()
 	log.Println(auth.isAuthenticated)
 	return res
 }
