@@ -3,8 +3,8 @@ package authenticate
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	User "go-msgstory/user"
 	"log"
+	User "user"
 )
 
 type Authenticate struct {

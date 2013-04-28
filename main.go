@@ -6,13 +6,13 @@ import (
 	"fmt"
 	// "log"
 	Authenticate "authenticate"
-	Circle "go-msgstory/circle"
-	GeoLocation "go-msgstory/geolocation"
-	Mesiji "go-msgstory/message"
-	Register "go-msgstory/register"
-	User "go-msgstory/user"
+	Circle "circle"
+	GeoLocation "geolocation"
+	Mesiji "message"
 	"net/http"
+	Register "register"
 	"strings"
+	User "user"
 )
 
 type person struct {
