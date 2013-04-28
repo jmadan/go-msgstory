@@ -1,4 +1,4 @@
-export GOPATH=/home/travis/gopath/jmadan/go-msgstory 
+#export GOPATH=/home/travis/gopath/jmadan/go-msgstory 
 
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -7,8 +7,9 @@ GOINSTALL=$(GOCMD) install
 GOTEST=$(GOCMD) test
 GODEP=$(GOTEST) -i
 GOFMT=gofmt -w
+GOGET=$(GOCMD) get
 
-TARG=go-msgstory
+TARG=msgstory
 
 GOFILES=\
 	main.go\
@@ -18,10 +19,16 @@ GOFILES=\
 	user/user.go\
 	message/message.go\
 
+all:
+	${GOINSTALL} msgstory
+
 
 format:
 	${GOFMT} -w ${GOFILES}
 
-all:
-	$(GOINSTALL)
-
+test:
+	$(GOTEST) ./user
+	$(GOTEST) ./message
+	$(GOTEST) ./register
+	$(GOTEST) ./authenticate
+	$(GOTEST) ./circle
