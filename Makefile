@@ -20,6 +20,7 @@ GOFILES=\
 	message/message.go\
 
 all:
+	${GOGET}
 	${GOINSTALL}
 
 build:
