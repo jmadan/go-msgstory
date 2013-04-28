@@ -20,7 +20,7 @@ GOFILES=\
 	message/message.go\
 
 all:
-	${GOBUILD}
+	${GOBUILD} ${GOFILES}
 
 build:
 	${GOBUILD} ./user/user.go
