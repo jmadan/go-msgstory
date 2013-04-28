@@ -8,4 +8,5 @@ install:
   - mkdir -p $GOPATH/src/github.com
   - mv $HOME/build/jmadan $GOPATH/src/github.com/
   - cd $GOPATH/src/github.com/jmadan/go-msgstory
-  - go build -v user/user.go && go install user/
+  - go build -v user/user.go
+  - go install user
