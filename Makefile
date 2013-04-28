@@ -1,4 +1,5 @@
-#export GOPATH=/home/travis/gopath/jmadan/go-msgstory 
+export GOPATH=/home/travis/gopath/jmadan/go-msgstory
+export GOBIN=/home/travis/gopath/bin
 
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -20,7 +21,7 @@ GOFILES=\
 	message/message.go\
 
 all:
-	${GOBUILD} ${GOFILES}
+	${GOBUILD} .
 
 build:
 	${GOBUILD} ./user/user.go
