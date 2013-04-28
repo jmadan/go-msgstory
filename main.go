@@ -47,6 +47,7 @@ type AuthenticateService struct {
 	gorest.RestService `root:"/"`
 	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
 	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
+	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
 }
 
 type CircleService struct {
@@ -79,21 +80,21 @@ func (serv CircleService) CreateCircle(posted string) {
 //*************Authentication Service Methods ***************
 func (serv AuthenticateService) RegisterUser(posted string) {
 	var str []string
-	var dude string
+	var dude User.User
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
-	msg := Authenticate.Login(useremail[1], password[1])
-	if msg == "Logged In" {
-		dude = User.GetUserByEmail(useremail[1])
-		// log.Println(dude.Name + "logged in successfully")
-	}
+	dude = Authenticate.Login(useremail[1], password[1])
 	fmt.Println(dude)
 }
 
 func (serv AuthenticateService) CreateUser(uemail, pass string) string {
 	Register.Register(uemail, pass)
 	return "Executed!!!"
+}
+
+func (serv AuthenticateService) LoginUser(posted string) {
+	fmt.Println(posted)
 }
 
 //*************Message Service Methods ***************
