@@ -1,12 +1,12 @@
 package message
 
 import (
-	Circle "circle"
 	"encoding/json"
 	"fmt"
-	Venue "geolocation"
+	Circle "github.com/jmadan/go-msgstory/circle"
+	Venue "github.com/jmadan/go-msgstory/geolocation"
+	User "github.com/jmadan/go-msgstory/user"
 	"log"
-	User "user"
 )
 
 type Message struct {

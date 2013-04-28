@@ -1,9 +1,9 @@
 package conversation
 
 import (
+	Msg "github.com/jmadan/go-msgstory/message"
+	User "github.com/jmadan/go-msgstory/user"
 	"log"
-	Msg "message"
-	User "user"
 )
 
 type Conversation struct {

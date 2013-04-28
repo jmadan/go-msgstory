@@ -4,15 +4,15 @@ import (
 	"code.google.com/p/gorest"
 	"encoding/json"
 	"fmt"
-	// "log"
-	Authenticate "authenticate"
-	Circle "circle"
-	GeoLocation "geolocation"
-	Mesiji "message"
+	Authenticate "github.com/jmadan/go-msgstory/authenticate"
+	Circle "github.com/jmadan/go-msgstory/circle"
+	GeoLocation "github.com/jmadan/go-msgstory/geolocation"
+	Mesiji "github.com/jmadan/go-msgstory/message"
+	Register "github.com/jmadan/go-msgstory/register"
+	User "github.com/jmadan/go-msgstory/user"
+	"log"
 	"net/http"
-	Register "register"
 	"strings"
-	User "user"
 )
 
 type person struct {
@@ -66,6 +66,7 @@ func (serv LocationService) GetLocations(place string) string {
 	for i := range str {
 		fmt.Println(str[i])
 	}
+	log.Println("getLocation")
 	return "done"
 }
 
