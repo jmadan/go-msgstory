@@ -1,9 +1,9 @@
 package conversation
 
 import (
+	Msg "go-msgstory/message"
+	User "go-msgstory/user"
 	"log"
-	Msg "msgstory/message"
-	User "msgstory/user"
 )
 
 type Conversation struct {

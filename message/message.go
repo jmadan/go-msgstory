@@ -3,10 +3,10 @@ package message
 import (
 	"encoding/json"
 	"fmt"
+	Circle "go-msgstory/circle"
+	Venue "go-msgstory/geolocation"
+	User "go-msgstory/user"
 	"log"
-	Circle "msgstory/circle"
-	Venue "msgstory/geolocation"
-	User "msgstory/user"
 )
 
 type Message struct {
@@ -32,5 +32,6 @@ func PostIt(msgtext string) string {
 	}
 
 	fmt.Println(tempMsg)
+
 	return tempMsg.Msg
 }
