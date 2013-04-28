@@ -9,7 +9,7 @@ GODEP=$(GOTEST) -i
 GOFMT=gofmt -w
 GOGET=$(GOCMD) get
 
-TARG=msgstory
+TARG=go-msgstory
 
 GOFILES=\
 	main.go\
@@ -22,13 +22,16 @@ GOFILES=\
 all:
 	${GOINSTALL}
 
+build:
+	${GOBUILD} ./user/user.go
+	
 
 format:
 	${GOFMT} -w ${GOFILES}
 
 test:
-	$(GOTEST) ./user
-	$(GOTEST) ./message
-	$(GOTEST) ./register
-	$(GOTEST) ./authenticate
-	$(GOTEST) ./circle
+	${GOTEST} ./user
+	${GOTEST} ./message
+	${GOTEST} ./register
+	${GOTEST} ./authenticate
+	${GOTEST} ./circle
