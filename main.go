@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	// "log"
-	Authenticate "go-msgstory/authenticate"
+	Authenticate "authenticate"
 	Circle "go-msgstory/circle"
 	GeoLocation "go-msgstory/geolocation"
 	Mesiji "go-msgstory/message"
