@@ -1,8 +1,7 @@
 language: go
 
 before_install:
-  - go get code.google.com/p/gorest
-  - go get labix.org/v2/mgo
+  - go get 
 
 install:
   - echo $GOPATH
@@ -10,4 +9,10 @@ install:
   - mv $HOME/build/jmadan $GOPATH/src/github.com/
   - cd $GOPATH/src/github.com/jmadan/go-msgstory
   - echo $PWD
-  - go install ./user
+  - go install .
+
+script:
+  - go test ./...
+
+notifications:
+  email: false
