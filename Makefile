@@ -20,7 +20,7 @@ GOFILES=\
 	message/message.go\
 
 all:
-	${GOINSTALL} go-msgstory
+	${GOINSTALL}
 
 
 format:
