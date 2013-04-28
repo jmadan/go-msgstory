@@ -1,4 +1,4 @@
-export GOPATH=$(PATH):jmadan/go-msgstory 
+export GOPATH=/home/travis/gopath/jmadan/go-msgstory 
 
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -16,7 +16,6 @@ GOFILES=\
 	authenticate/authenticate.go\
 	circle/circle.go\
 	user/user.go\
-	geolocation/geolocation.go\
 	message/message.go\
 
 
