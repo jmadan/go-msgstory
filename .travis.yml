@@ -1,1 +1,9 @@
 language: go
+
+before_install:
+  - go get code.google.com/p/gorest
+install:
+  - mkdir -p $GOPATH/src/github.com
+  - mv $HOME/build/jmadan $GOPATH/src/github.com/
+  - cd $GOPATH/src/github.com/jmadan/go-msgstory
+  - go get -d -v ./... && go build -v ./...
