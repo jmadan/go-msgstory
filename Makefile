@@ -1,5 +1,5 @@
-export GOPATH=/home/travis/gopath/jmadan/go-msgstory
-export GOBIN=/home/travis/gopath/bin
+#export GOPATH=/home/travis/gopath/jmadan/go-msgstory
+#export GOBIN=/home/travis/gopath/bin
 
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -20,11 +20,10 @@ GOFILES=\
 	user/user.go\
 	message/message.go\
 
-all:
-	${GOBUILD} .
+all: build test
 
 build:
-	${GOBUILD} ./user/user.go
+	${GOBUILD} .
 	
 
 format:
@@ -36,3 +35,5 @@ test:
 	${GOTEST} ./register
 	${GOTEST} ./authenticate
 	${GOTEST} ./circle
+
+.PHONY: advice build clean documentation format test

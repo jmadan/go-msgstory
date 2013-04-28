@@ -5,8 +5,9 @@ before_install:
   - go get labix.org/v2/mgo
 
 install:
+  - echo $GOPATH
   - mkdir -p $GOPATH/src/github.com
   - mv $HOME/build/jmadan $GOPATH/src/github.com/
   - cd $GOPATH/src/github.com/jmadan/go-msgstory
-  - go build -v user/user.go
+  - echo $PWD
   - go install ./user
