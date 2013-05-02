@@ -3,7 +3,7 @@ package circle
 import (
 	"encoding/json"
 	"fmt"
-	Connection "github.com/go-msgstory/connection"
+	Connection "github.com/jmadan/go-msgstory/connection"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"

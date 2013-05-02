@@ -1,7 +1,7 @@
 package connection
 
 import (
-	User "github.com/go-msgstory/user"
+	User "github.com/jmadan/go-msgstory/user"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"testing"
