@@ -2,8 +2,10 @@ package circle
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	Connection "github.com/jmadan/go-msgstory/connection"
+	// Connection "go-msgstory/connection"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
@@ -105,29 +107,42 @@ func (c *Circle) GetJson() string {
 	return string(str)
 }
 
-// func CreateCircle(name string, desc string, owner User) string {
-func CreateCircle(name, desc, creatorID string, members []string) string {
-
-	msgCircle := Circle{name, desc, creatorID, time.Now().String(), members}
-
-	if CheckIfCircleExists(&msgCircle) {
-		return "Duplicate! Circle already exists"
-	}
+func (cir *Circle) makeCircle() (bool, error) {
+	status := true
 	dbSession, err := mgo.Dial("localhost")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	dbSession.SetMode(mgo.Monotonic, true)
 	c := dbSession.DB("msgme").C("circle")
-	// c := Connection.GetDataBase("circle")
 
-	fmt.Println(msgCircle.GetJson())
-
-	err = c.Insert(msgCircle)
+	err = c.Insert(cir.GetJson())
 	if err != nil {
-		fmt.Println(err.Error())
+		status = false
+		log.Println(err.Error())
 	}
-	return "Circle created"
+
+	return status, err
+}
+
+// func CreateCircle(name string, desc string, owner User) string {
+func CreateCircle(name, desc, creatorID string, members []string) (string, error) {
+	var isCreated bool
+	var err error
+
+	msgCircle := Circle{name, desc, creatorID, time.Now().String(), members}
+
+	if CheckIfCircleExists(&msgCircle) {
+		isCreated = false
+		err = errors.New("Circle already exists with this name")
+	} else {
+		isCreated, err = msgCircle.makeCircle()
+	}
+
+	if isCreated {
+		return "Circle created", err
+	}
+	return "fuck off!", err
 }
 
 // func CheckIfCircleExists(name string, owner User) (exists bool, msg string) {
