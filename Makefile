@@ -20,7 +20,7 @@ GOFILES=\
 	user/user.go\
 	message/message.go\
 
-all: build test
+all: test build
 
 build:
 	${GOBUILD} .

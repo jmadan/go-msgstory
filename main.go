@@ -10,7 +10,6 @@ import (
 	Mesiji "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
 	User "github.com/jmadan/go-msgstory/user"
-	// Conversation "go-msgstory/conversation"
 	"log"
 	"net/http"
 	"strings"
