@@ -79,8 +79,12 @@ func (serv LocationService) GetLocations(place string) string {
 func (serv CircleService) CreateCircle(posted string) {
 	var str []string
 	str = strings.Split(posted, "=")
-	msg := Circle.CreateCircle(str[1], "")
-	fmt.Println(msg)
+	msg, err := Circle.CreateCircle(str[1], "", "", nil)
+	if err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println(msg)
+	}
 }
 
 //*************Authentication Service Methods ***************
