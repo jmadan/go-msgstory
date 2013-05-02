@@ -10,6 +10,7 @@ import (
 	Mesiji "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
 	User "github.com/jmadan/go-msgstory/user"
+	// Conversation "go-msgstory/conversation"
 	"log"
 	"net/http"
 	"strings"
@@ -36,10 +37,15 @@ type UserService struct {
 	getAll  gorest.EndPoint `method:"GET" path:"/all" output:"string"`
 }
 
+type ConversationService struct {
+	gorest.RestService `root:"/convoservice/" consumes:"application/json" produces:"application/json"`
+
+	buildConversation gorest.EndPoint `method:"GET" path:"/buildconversation/{convoid:string}" output:"[]byte"`
+}
+
 type MsgService struct {
 	gorest.RestService `root:"/message/" consumes:"application/json" produces:"application/json"`
-	getMessage         gorest.EndPoint `method:"GET" path:"/getmessage" output:"string"`
-	getLogin           gorest.EndPoint `method:"GET" path:"/login" output:"string"`
+	getMessages        gorest.EndPoint `method:"GET" path:"/getmessage" output:"string"`
 	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
 }
 
@@ -106,11 +112,6 @@ func (serv MsgService) GetMessage() string {
 		return err.Error()
 	}
 	return string(b)
-}
-
-func (serv MsgService) GetLogin() string {
-	return "Bazinga"
-	// return Authenticate.Login()
 }
 
 func (serv MsgService) PostMessage(posted string) {

@@ -3,17 +3,14 @@ package message
 import (
 	"encoding/json"
 	"fmt"
-	Circle "github.com/jmadan/go-msgstory/circle"
-	Venue "github.com/jmadan/go-msgstory/geolocation"
-	User "github.com/jmadan/go-msgstory/user"
 	"log"
 )
 
 type Message struct {
-	Msg      string
-	Circles  []*Circle.Circle
-	Location *Venue.GeoLocation
-	Owner    *User.User
+	Msg        string
+	CircleID   []string
+	LocationID string
+	OwnerID    string
 }
 
 func (M *Message) MsgToJSON() string {
