@@ -3,7 +3,7 @@ package circle
 import (
 	"encoding/json"
 	"fmt"
-	Connection "go-msgstory/connection"
+	Connection "github.com/go-msgstory/connection"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
@@ -107,10 +107,7 @@ func (c *Circle) GetJson() string {
 
 // func CreateCircle(name string, desc string, owner User) string {
 func CreateCircle(name, desc, creatorID string, members []string) string {
-	groupMembers, err := string(json.Marshal(members))
-	if err != nil {
-		log.Println(err.Error())
-	}
+
 	msgCircle := Circle{name, desc, creatorID, time.Now().String(), groupMembers}
 
 	if CheckIfCircleExists(&msgCircle) {
