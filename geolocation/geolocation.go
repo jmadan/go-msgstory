@@ -1,7 +1,6 @@
 package geolocation
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
