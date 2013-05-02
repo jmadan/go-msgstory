@@ -108,7 +108,7 @@ func (c *Circle) GetJson() string {
 // func CreateCircle(name string, desc string, owner User) string {
 func CreateCircle(name, desc, creatorID string, members []string) string {
 
-	msgCircle := Circle{name, desc, creatorID, time.Now().String(), groupMembers}
+	msgCircle := Circle{name, desc, creatorID, time.Now().String(), members}
 
 	if CheckIfCircleExists(&msgCircle) {
 		return "Duplicate! Circle already exists"
