@@ -1,7 +1,7 @@
 package geolocation
 
 import (
-	// "encoding/json"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -68,5 +68,11 @@ func GetNearVenues(glocation string) (glocale []string) {
 	// venues := []string{"MiddleOfNoWhere", "SomeWhere"}
 	gLocal := GeoLocation{}
 	venues := []string{gLocal.GetVenues("M46BA")}
+	return venues
+}
+
+func locations(response []string) []*GeoLocation {
+	var venues []*GeoLocation
+
 	return venues
 }
