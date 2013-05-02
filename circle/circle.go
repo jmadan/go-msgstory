@@ -3,15 +3,19 @@ package circle
 import (
 	"encoding/json"
 	"fmt"
+	Connection "go-msgstory/connection"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
+	"time"
 )
 
 type Circle struct {
-	Name       string `json:"name" bson:"name"`
-	Descrption string `json:"description" bson:"description"`
-	// Owner      *User
-	// Members    []*User
+	Name       string   `json:"name" bson:"name"`
+	Descrption string   `json:"description" bson:"description"`
+	CreatorID  string   `json:"creator" bson:"creator"`
+	CreatedOn  string   `json:"createdon" bson:"createdon"`
+	Members    []string `json:"members" bson:"members"`
 }
 
 type JsonCircle struct {
@@ -20,6 +24,50 @@ type JsonCircle struct {
 
 func (c *Circle) GetName() string {
 	return c.Name
+}
+
+func GetUserCircles(userID string) []string {
+	var userCircles []string
+	searchResults := []Circle{}
+	query := func(c *mgo.Collection) error {
+		fn := c.Find(bson.M{"members": userID}).All(&searchResults)
+		return fn
+	}
+	search := func() error {
+		return Connection.WithCollection("circle", query)
+	}
+	err := search()
+	if err != nil {
+		searchErr := "Database Error"
+		log.Println(searchErr)
+	}
+
+	for i, v := range searchResults {
+		userCircles[i] = v.Name
+	}
+	return userCircles
+}
+
+func GetCircleMembers(circleName string) []string {
+	var circleMembers []string
+	searchResults := []Circle{}
+	query := func(c *mgo.Collection) error {
+		fn := c.Find(bson.M{"name": circleName}).All(&searchResults)
+		return fn
+	}
+	search := func() error {
+		return Connection.WithCollection("circle", query)
+	}
+	err := search()
+	if err != nil {
+		searchErr := "Database Error"
+		log.Println(searchErr)
+	}
+
+	for i, v := range searchResults {
+		circleMembers[i] = v.Name
+	}
+	return circleMembers
 }
 
 // func (cir *circle) GetMembers(name string) (circle, exists bool) {
@@ -58,11 +106,15 @@ func (c *Circle) GetJson() string {
 }
 
 // func CreateCircle(name string, desc string, owner User) string {
-func CreateCircle(name, desc string) string {
-	msgCircle := Circle{name, desc}
+func CreateCircle(name, desc, creatorID string, members []string) string {
+	groupMembers, err := string(json.Marshal(members))
+	if err != nil {
+		log.Println(err.Error())
+	}
+	msgCircle := Circle{name, desc, creatorID, time.Now().String(), groupMembers}
 
 	if CheckIfCircleExists(&msgCircle) {
-		return "Duplicate"
+		return "Duplicate! Circle already exists"
 	}
 	dbSession, err := mgo.Dial("localhost")
 	if err != nil {
@@ -78,7 +130,7 @@ func CreateCircle(name, desc string) string {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	return "Done!"
+	return "Circle created"
 }
 
 // func CheckIfCircleExists(name string, owner User) (exists bool, msg string) {
