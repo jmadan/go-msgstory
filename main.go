@@ -6,7 +6,7 @@ import (
 	"fmt"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
-	GeoLocation "github.com/jmadan/go-msgstory/geolocation"
+	Glocation "github.com/jmadan/go-msgstory/geolocation"
 	Mesiji "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
 	User "github.com/jmadan/go-msgstory/user"
@@ -44,7 +44,7 @@ type ConversationService struct {
 
 type MsgService struct {
 	gorest.RestService `root:"/message/" consumes:"application/json" produces:"application/json"`
-	getMessages        gorest.EndPoint `method:"GET" path:"/getmessage" output:"string"`
+	getMessage         gorest.EndPoint `method:"GET" path:"/getmessage" output:"string"`
 	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
 }
 
@@ -58,6 +58,7 @@ type AuthenticateService struct {
 type CircleService struct {
 	gorest.RestService `root:"/circle"`
 	createCircle       gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
+	getCircles         gorest.EndPoint `method:"GET" path:"/circles/" output:"string"`
 }
 
 type LocationService struct {
@@ -67,12 +68,16 @@ type LocationService struct {
 
 // ************Location Service Methods ***********
 func (serv LocationService) GetLocations(place string) string {
-	str := GeoLocation.GetNearVenues(place)
-	for i := range str {
-		fmt.Println(str[i])
+	fmt.Println(place)
+	str := Glocation.GetVenues("Chelsea,London")
+	responseStr := "{\"locations\":["
+	for _, v := range str {
+		responseStr += "{\"id\": \"" + v.Id + "\","
+		responseStr += "\"name\": \"" + v.Name + "\"},"
 	}
-	log.Println("getLocation")
-	return "done"
+	responseStr += "]}"
+	serv.ResponseBuilder().SetResponseCode(200)
+	return responseStr
 }
 
 //*************Circle Service Methods ***************
@@ -84,7 +89,12 @@ func (serv CircleService) CreateCircle(posted string) {
 		log.Println(err)
 	} else {
 		fmt.Println(msg)
+		serv.ResponseBuilder().SetResponseCode(200)
 	}
+}
+
+func (serv CircleService) GetCircles() string {
+	return Circle.GetUserCircles("")[0]
 }
 
 //*************Authentication Service Methods ***************
