@@ -2,7 +2,7 @@ package main
 
 import (
 	"code.google.com/p/gorest"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
@@ -15,25 +15,15 @@ import (
 	"strings"
 )
 
-type person struct {
-	Name  string
-	Email string
-}
-
-type testMessage struct {
-	Msg string
-}
-
 type AppService struct {
 	gorest.RestService `root:"/"`
 	getApp             gorest.EndPoint `method:"GET" path:"/" output:"string"`
 }
 
 type UserService struct {
-	gorest.RestService `root:"/user-service/"`
-	// getUser            gorest.EndPoint `method:"GET" path:"/getuser/{name:string}" output:"string"`
-	getUser gorest.EndPoint `method:"GET" path:"/user" output:"string"`
-	getAll  gorest.EndPoint `method:"GET" path:"/all" output:"string"`
+	gorest.RestService `root:"/user-service/" consumes:"aplication/json" produces:"application/json"`
+	getUser            gorest.EndPoint `method:"GET" path:"/user" output:"string"`
+	getAll             gorest.EndPoint `method:"GET" path:"/all" output:"string"`
 }
 
 type ConversationService struct {
@@ -49,20 +39,20 @@ type MsgService struct {
 }
 
 type AuthenticateService struct {
-	gorest.RestService `root:"/"`
+	gorest.RestService `root:"/auth/" consumes:"aplication/json" produces:"application/json"`
 	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
 	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
 }
 
 type CircleService struct {
-	gorest.RestService `root:"/circle"`
+	gorest.RestService `root:"/circle/" consumes:"aplication/json" produces:"application/json"`
 	createCircle       gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
 	getCircles         gorest.EndPoint `method:"GET" path:"/circles/" output:"string"`
 }
 
 type LocationService struct {
-	gorest.RestService `root:"/locations/"`
+	gorest.RestService `root:"/location/" consumes:"aplication/json" produces:"application/json"`
 	getLocations       gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
 }
 
@@ -100,12 +90,16 @@ func (serv CircleService) GetCircles() string {
 //*************Authentication Service Methods ***************
 func (serv AuthenticateService) RegisterUser(posted string) {
 	var str []string
-	var dude User.User
+	// var dude User.User
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
-	dude = Authenticate.Login(useremail[1], password[1])
-	fmt.Println(dude)
+	dude, err := Authenticate.Login(useremail[1], password[1])
+	if err != nil {
+		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(200)
+	}
 }
 
 func (serv AuthenticateService) CreateUser(uemail, pass string) string {
@@ -114,17 +108,22 @@ func (serv AuthenticateService) CreateUser(uemail, pass string) string {
 }
 
 func (serv AuthenticateService) LoginUser(posted string) {
-	fmt.Println(posted)
+	var str []string
+	str = strings.Split(posted, "&")
+	useremail := strings.SplitAfter(str[0], "=")
+	password := strings.SplitAfter(str[1], "=")
+	dude, err := Authenticate.Login(useremail[1], password[1])
+	if err != nil {
+		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(200)
+	}
 }
 
 //*************Message Service Methods ***************
 func (serv MsgService) GetMessage() string {
-	m := testMessage{"here it is!"}
-	b, err := json.Marshal(m)
-	if err != nil {
-		return err.Error()
-	}
-	return string(b)
+	m := "{\"Message\": \"Welcome to Mesiji\"}"
+	return m
 }
 
 func (serv MsgService) PostMessage(posted string) {
@@ -147,12 +146,8 @@ func (serv UserService) GetAll() string {
 
 //*************App Service Methods ***************
 func (serv AppService) GetApp() string {
-	m := testMessage{"Welcome to Message Story"}
-	b, err := json.Marshal(m)
-	if err != nil {
-		return err.Error()
-	}
-	return string(b)
+	m := "{\"Message\": \"Welcome to Mesiji\"}"
+	return m
 }
 
 func getData(w http.ResponseWriter, r *http.Request) {
