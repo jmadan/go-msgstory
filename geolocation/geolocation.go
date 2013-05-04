@@ -91,7 +91,7 @@ type Icon struct {
 }
 
 func GetVenues(near string) []Venue {
-	FSqrUrl := "https://api.foursquare.com/v2/venues/search?v=20130417&near=<nearLocation>&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FQSR_CLIENT_SECRET")
+	FSqrUrl := "https://api.foursquare.com/v2/venues/search?v=20130417&near=<nearLocation>&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET")
 	FSqrUrl = strings.Replace(FSqrUrl, "<nearLocation>", near, -1)
 	log.Println(FSqrUrl)
 
