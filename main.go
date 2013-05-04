@@ -94,7 +94,7 @@ func (serv AuthenticateService) RegisterUser(posted string) {
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
-	dude, err := Authenticate.Login(useremail[1], password[1])
+	_, err := Authenticate.Login(useremail[1], password[1])
 	if err != nil {
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	} else {
@@ -112,7 +112,7 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
-	dude, err := Authenticate.Login(useremail[1], password[1])
+	_, err := Authenticate.Login(useremail[1], password[1])
 	if err != nil {
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	} else {
