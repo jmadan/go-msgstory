@@ -16,12 +16,12 @@ import (
 )
 
 type AppService struct {
-	gorest.RestService `root:"/"`
+	gorest.RestService `root:"/" consumes:"application/json" produces:"application/json"`
 	getApp             gorest.EndPoint `method:"GET" path:"/" output:"string"`
 }
 
 type UserService struct {
-	gorest.RestService `root:"/user-service/" consumes:"aplication/json" produces:"application/json"`
+	gorest.RestService `root:"/user-service/" consumes:"application/json" produces:"application/json"`
 	getUser            gorest.EndPoint `method:"GET" path:"/user" output:"string"`
 	getAll             gorest.EndPoint `method:"GET" path:"/all" output:"string"`
 }
@@ -39,20 +39,20 @@ type MsgService struct {
 }
 
 type AuthenticateService struct {
-	gorest.RestService `root:"/auth/" consumes:"aplication/json" produces:"application/json"`
+	gorest.RestService `root:"/auth/" consumes:"application/json" produces:"application/json"`
 	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
 	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
 }
 
 type CircleService struct {
-	gorest.RestService `root:"/circle/" consumes:"aplication/json" produces:"application/json"`
+	gorest.RestService `root:"/circle/" consumes:"application/json" produces:"application/json"`
 	createCircle       gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
 	getCircles         gorest.EndPoint `method:"GET" path:"/circles/" output:"string"`
 }
 
 type LocationService struct {
-	gorest.RestService `root:"/location/" consumes:"aplication/json" produces:"application/json"`
+	gorest.RestService `root:"/location/" consumes:"application/json" produces:"application/json"`
 	getLocations       gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
 }
 
@@ -90,16 +90,25 @@ func (serv CircleService) GetCircles() string {
 //*************Authentication Service Methods ***************
 func (serv AuthenticateService) RegisterUser(posted string) {
 	var str []string
-	// var dude User.User
+	// var jsonResp []byte
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
 	_, err := Authenticate.Login(useremail[1], password[1])
 	if err != nil {
+		log.Println(err.Error())
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+		// return "{\"error\": \"" + err.Error() + "\"}"
 	} else {
 		serv.ResponseBuilder().SetResponseCode(200)
+		// jsonResp, err = json.Marshal(&person)
+		// if err != nil {
+		// 	log.Println(err.Error())
+		// 	serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+		// 	// return "{\"error\": \"" + err.Error() + "\"}"
+		// }
 	}
+	// return string(jsonResp)
 }
 
 func (serv AuthenticateService) CreateUser(uemail, pass string) string {
@@ -109,15 +118,25 @@ func (serv AuthenticateService) CreateUser(uemail, pass string) string {
 
 func (serv AuthenticateService) LoginUser(posted string) {
 	var str []string
+	// var jsonResp []byte
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
 	_, err := Authenticate.Login(useremail[1], password[1])
 	if err != nil {
+		log.Println(err.Error())
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+		// return "{\"error\": \"" + err.Error() + "\"}"
 	} else {
 		serv.ResponseBuilder().SetResponseCode(200)
+		// jsonResp, err = json.Marshal(&person)
+		// if err != nil {
+		// 	log.Println(err.Error())
+		// 	serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+		// 	// return "{\"error\": \"" + err.Error() + "\"}"
+		// }
 	}
+	// return string(jsonResp)
 }
 
 //*************Message Service Methods ***************
