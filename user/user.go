@@ -7,11 +7,8 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
+	"os"
 )
-
-type name struct {
-	Fullname string `json:"fullname" bson:"fullname"`
-}
 
 type User struct {
 	UserId int    `json:"userid" bson:"userid"`
@@ -96,30 +93,6 @@ func GetAll() string {
 	return "hello"
 }
 
-// func CreateUser(user string) {
-
-// 	session, err := mgo.Dial("localhost")
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("msgme").C("jove")
-
-// 	newUser := User{}
-// 	err = json.Unmarshal([]byte(user), &newUser)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-
-// 	err = c.Insert(newUser)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	fmt.Print("hello")
-// }
-
-// func (user User) MarshalJSON() ([]byte, error) {
 func (u *User) MarshalJSON() ([]byte, error) {
 	jsonUser := JSONUser{
 		u.UserId,
@@ -133,7 +106,7 @@ func (u *User) MarshalJSON() ([]byte, error) {
 }
 
 func GetByEmailAndUserId(email string, user_id int) (User, error) {
-	session, err := mgo.Dial("localhost")
+	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -152,7 +125,7 @@ func GetByEmailAndUserId(email string, user_id int) (User, error) {
 }
 
 func (u *User) GetByHandle() User {
-	session, err := mgo.Dial("localhost")
+	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -172,7 +145,7 @@ func (u *User) GetByHandle() User {
 }
 
 func (u *User) CreateUser() bool {
-	session, err := mgo.Dial("localhost")
+	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
