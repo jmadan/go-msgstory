@@ -10,12 +10,12 @@ import (
 type Authenticate struct {
 	email           string
 	password        string
-	user_id         string
+	user_id         int
 	isAuthenticated bool
 }
 
 //private function to verify credentials with MySQL
-func (a *Authenticate) authorize() (User.User, Authenticate) {
+func (a *Authenticate) authorize() (User.User, error) {
 	var person User.User
 
 	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
@@ -40,16 +40,16 @@ func (a *Authenticate) authorize() (User.User, Authenticate) {
 	} else {
 		a.isAuthenticated = true
 		log.Println("Logged In")
-		person = User.GetByEmail(a.email)
+		person, err = User.GetByEmailAndUserId(a.email, a.user_id)
 	}
 
-	return person, *a
+	return person, err
 }
 
 //Login function to check users credentials
-func Login(email, password string) User.User {
-	a := Authenticate{email, password, "", false}
-	res, auth := a.authorize()
-	log.Println(auth.isAuthenticated)
-	return res
+func Login(email, password string) (User.User, error) {
+	a := Authenticate{email, password, 0, false}
+	user, err := a.authorize()
+	log.Println(err.Error())
+	return user, err
 }
