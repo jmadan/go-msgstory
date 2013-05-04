@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -89,13 +90,8 @@ type Icon struct {
 	Suffix string
 }
 
-const (
-	FSQR_CLIENT_ID     = "052K4OL11WWWBVKTTREAXQVMOEMA0SPERTSKUQLVS1ALQMRP"
-	FQSR_CLIENT_SECRET = "KCQIMSET51UBMQH4LQEHPJCCERQKYJB2J3LYJLS0X02PJQBR"
-)
-
 func GetVenues(near string) []Venue {
-	FSqrUrl := "https://api.foursquare.com/v2/venues/search?v=20130417&near=<nearLocation>&client_id=" + FSQR_CLIENT_ID + "&client_secret=" + FQSR_CLIENT_SECRET
+	FSqrUrl := "https://api.foursquare.com/v2/venues/search?v=20130417&near=<nearLocation>&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FQSR_CLIENT_SECRET")
 	FSqrUrl = strings.Replace(FSqrUrl, "<nearLocation>", near, -1)
 	log.Println(FSqrUrl)
 
