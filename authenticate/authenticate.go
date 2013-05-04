@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	User "github.com/jmadan/go-msgstory/user"
 	"log"
+	"os"
 )
 
 type Authenticate struct {
@@ -17,8 +18,10 @@ type Authenticate struct {
 //private function to verify credentials with MySQL
 func (a *Authenticate) authorize() (User.User, error) {
 	var person User.User
+	dburl := os.Getenv("CLEARDB_DATABASE_URL")
 
-	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
+	// db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
+	db, err := sql.Open("mysql", dburl[8:])
 	if err != nil {
 		log.Fatal(err.Error())
 	}
