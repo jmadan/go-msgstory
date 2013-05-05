@@ -12,6 +12,7 @@ import (
 	User "github.com/jmadan/go-msgstory/user"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -174,6 +175,7 @@ func getData(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	log.Println(os.Getenv("PORT"))
 	gorest.RegisterService(new(AppService))
 	gorest.RegisterService(new(UserService))
 	gorest.RegisterService(new(MsgService))
@@ -182,6 +184,6 @@ func main() {
 	gorest.RegisterService(new(LocationService))
 	http.Handle("/", gorest.Handle())
 	// http.HandleFunc("/tempurl", getData)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	// User.GetAll()
 }
