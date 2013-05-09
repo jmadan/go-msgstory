@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/gorest"
 	// "encoding/json"
 	"fmt"
-	SJ "github.com/bitly/go-simplejson"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Glocation "github.com/jmadan/go-msgstory/geolocation"
@@ -74,7 +73,7 @@ func (serv LocationService) GetLocations(place string) string {
 }
 
 func (serv LocationService) GetLocationsWithLatLng(lat, lng string) string {
-	str := Glocation.GetVenuesWithLatitudeAndLongitude(lt, lg)
+	str := Glocation.GetVenuesWithLatitudeAndLongitude(lat, lng)
 	serv.ResponseBuilder().SetResponseCode(200)
 	return str
 }
