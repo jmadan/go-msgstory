@@ -1,8 +1,9 @@
 package geolocation
 
 import (
-	// simplejson "github.com/bitly/go-simplejson"
 	"encoding/json"
+	SJ "github.com/bitly/go-simplejson"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -90,7 +91,7 @@ type Icon struct {
 	Suffix string
 }
 
-func GetVenues(near string) []Venue {
+func GetVenues(near string) string {
 	FSqrUrl := "https://api.foursquare.com/v2/venues/search?v=20130417&near=<nearLocation>&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET")
 	FSqrUrl = strings.Replace(FSqrUrl, "<nearLocation>", near, -1)
 	log.Println(FSqrUrl)
@@ -98,51 +99,97 @@ func GetVenues(near string) []Venue {
 	return getLocations(FSqrUrl)
 }
 
-func GetVenuesWithLatitudeAndLongitude(lt, lg string) []Venue {
-	latandlong := lt + "," + lg
+func GetVenuesWithLatitudeAndLongitude(lt, lg string) string {
 	var FSqrUrl string
-	FSqrUrl = "https://api.foursquare.com/v2/venues/search?v=20130417&ll=<latandlong>&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET") + "\""
-	FSqrUrl = strings.Replace(FSqrUrl, "<latandlong>", latandlong, -1)
+	FSqrUrl = "https://api.foursquare.com/v2/venues/search?v=20130417&ll=" + lt + "," + lg + "&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET") + "\""
+	// FSqrUrl = strings.Replace(FSqrUrl, "<lat>", lt, -1)
+	// FSqrUrl = strings.Replace(FSqrUrl, "<lng>", lg, -1)
 
 	return getLocations(FSqrUrl)
 }
 
-func getLocations(FSqrUrl string) []Venue {
+func getLocations(FSqrUrl string) string {
 	res, err := http.Get(FSqrUrl)
 	if err != nil {
 		log.Println("getVenues error: " + err.Error())
 	}
 	defer res.Body.Close()
-
-	var jsonFeed *Feed
-	decoder := json.NewDecoder(res.Body)
-	if err = decoder.Decode(&jsonFeed); err != nil {
-		log.Println(err.Error())
-	}
-
-	locations := make([]Venue, len(jsonFeed.Gresponse.Rvenue))
-	for i, tvenue := range jsonFeed.Gresponse.Rvenue {
-		locations[i].Id = tvenue.Id
-		locations[i].Name = tvenue.Name
-		locations[i].Gcontact.Phone = tvenue.Gcontact.Phone
-		locations[i].Gcontact.FormattedPhone = tvenue.Gcontact.FormattedPhone
-		// locations[i].Glocation = tvenue.Glocation
-	}
-	return locations
+	str, _ := ioutil.ReadAll(res.Body)
+	Venues := getJsonVenues(str)
+	return Venues
 }
 
-func locations(response []byte) {
-	var object *Response
-	// log.Println(string(response))
-	// u := &FsqrLocation{}
-	err := json.Unmarshal(response, &object)
-	// err := simplejson.Unmarshal(response, &u)
-	if err != nil {
-		panic(err)
-	}
-	log.Println(object.Rvenue)
-	// jsonObject := object.(map[string]interface{})
+func getJsonVenues(resp []byte) string {
+	var str string
+	var flt float64
+	locs := "["
 
-	// Print out mother and father
-	// log.Println(Util.JsonObjectAsString(jsonObject))
+	js, err := SJ.NewJson(resp)
+	if err != nil {
+		log.Println(err.Error())
+		return err.Error()
+	}
+	arr := js.Get("response").Get("venues")
+	resLen, _ := arr.Array()
+
+	// fmt.Println(len(resLen))
+	places := make([]Venue, len(resLen))
+	for i := 0; i < len(resLen); i++ {
+		if id, ok := arr.GetIndex(i).CheckGet("id"); ok {
+			str, _ = id.String()
+			places[i].Id = str
+		}
+		if name, ok := arr.GetIndex(i).CheckGet("name"); ok {
+			str, _ = name.String()
+			places[i].Name = str
+		}
+		if phone, ok := arr.GetIndex(i).Get("contact").CheckGet("phone"); ok {
+			flt, _ = phone.Float64()
+			places[i].Gcontact.Phone = flt
+		}
+		if formattedPhone, ok := arr.GetIndex(i).Get("contact").CheckGet("formattedPhone"); ok {
+			str, _ = formattedPhone.String()
+			places[i].Gcontact.FormattedPhone = str
+		}
+		if address, ok := arr.GetIndex(i).Get("location").CheckGet("address"); ok {
+			str, _ = address.String()
+			places[i].Glocation.Address = str
+		}
+		if lat, ok := arr.GetIndex(i).Get("location").CheckGet("lat"); ok {
+			flt, _ = lat.Float64()
+			places[i].Glocation.Lat = flt
+		}
+		if lng, ok := arr.GetIndex(i).Get("location").CheckGet("lng"); ok {
+			flt, _ = lng.Float64()
+			places[i].Glocation.Lng = flt
+		}
+		if postalCode, ok := arr.GetIndex(i).Get("location").CheckGet("postalCode"); ok {
+			str, _ = postalCode.String()
+			places[i].Glocation.PostalCode = str
+		}
+		if city, ok := arr.GetIndex(i).Get("location").CheckGet("city"); ok {
+			str, _ = city.String()
+			places[i].Glocation.City = str
+		}
+		if state, ok := arr.GetIndex(i).Get("location").CheckGet("state"); ok {
+			str, _ = state.String()
+			places[i].Glocation.State = str
+		}
+		if country, ok := arr.GetIndex(i).Get("location").CheckGet("country"); ok {
+			str, _ = country.String()
+			places[i].Glocation.Country = str
+		}
+		if cc, ok := arr.GetIndex(i).Get("location").CheckGet("cc"); ok {
+			str, _ = cc.String()
+			places[i].Glocation.CC = str
+		}
+		temp, _ := json.Marshal((places[i]))
+		locs += string(temp)
+
+		if i < len(resLen)-1 {
+			locs += ","
+		}
+	}
+	locs += "]"
+	return string(locs)
 }
