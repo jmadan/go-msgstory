@@ -62,12 +62,12 @@ type LocationService struct {
 func (serv LocationService) GetLocations(place string) string {
 	fmt.Println(place)
 	str := Glocation.GetVenues("Chelsea,London")
-	responseStr := "{\"locations\":["
-	for _, v := range str {
-		responseStr += "{\"id\": \"" + v.Id + "\","
-		responseStr += "\"name\": \"" + v.Name + "\"},"
-	}
-	responseStr += "]}"
+	// responseStr := "{\"locations\":["
+	// for _, v := range str {
+	// 	responseStr += "{\"id\": \"" + v.Id + "\","
+	// 	responseStr += "\"name\": \"" + v.Name + "\"},"
+	// }
+	// responseStr += "]}"
 	serv.ResponseBuilder().SetResponseCode(200)
 	return responseStr
 }
