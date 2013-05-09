@@ -61,7 +61,7 @@ type LocationService struct {
 // ************Location Service Methods ***********
 func (serv LocationService) GetLocations(place string) string {
 	fmt.Println(place)
-	str := Glocation.GetVenues("Chelsea,London")
+	resp := Glocation.GetVenues("Chelsea,London")
 	// responseStr := "{\"locations\":["
 	// for _, v := range str {
 	// 	responseStr += "{\"id\": \"" + v.Id + "\","
@@ -69,7 +69,7 @@ func (serv LocationService) GetLocations(place string) string {
 	// }
 	// responseStr += "]}"
 	serv.ResponseBuilder().SetResponseCode(200)
-	return responseStr
+	return resp
 }
 
 func (serv LocationService) GetLocationsWithLatLng(lat, lng string) string {
