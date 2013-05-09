@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/gorest"
 	// "encoding/json"
 	"fmt"
+	SJ "github.com/bitly/go-simplejson"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Glocation "github.com/jmadan/go-msgstory/geolocation"
@@ -53,8 +54,9 @@ type CircleService struct {
 }
 
 type LocationService struct {
-	gorest.RestService `root:"/location/" consumes:"application/json" produces:"application/json"`
-	getLocations       gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
+	gorest.RestService     `root:"/location/" consumes:"application/json" produces:"application/json"`
+	getLocations           gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
+	getLocationsWithLatLng gorest.EndPoint `method:"GET" path:"/coordinates/{lat:float64}/{lng:float64}" output:"string"`
 }
 
 // ************Location Service Methods ***********
@@ -69,6 +71,12 @@ func (serv LocationService) GetLocations(place string) string {
 	responseStr += "]}"
 	serv.ResponseBuilder().SetResponseCode(200)
 	return responseStr
+}
+
+func (serv LocationService) GetLocationsWithLatLng(lat, lng string) string {
+	str := Glocation.GetVenuesWithLatitudeAndLongitude(lt, lg)
+	serv.ResponseBuilder().SetResponseCode(200)
+	return str
 }
 
 //*************Circle Service Methods ***************
@@ -99,17 +107,10 @@ func (serv AuthenticateService) RegisterUser(posted string) {
 	if err != nil {
 		log.Println(err.Error())
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-		// return "{\"error\": \"" + err.Error() + "\"}"
 	} else {
 		serv.ResponseBuilder().SetResponseCode(200)
-		// jsonResp, err = json.Marshal(&person)
-		// if err != nil {
-		// 	log.Println(err.Error())
-		// 	serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-		// 	// return "{\"error\": \"" + err.Error() + "\"}"
-		// }
 	}
-	// return string(jsonResp)
+	return
 }
 
 func (serv AuthenticateService) CreateUser(uemail, pass string) string {
@@ -127,17 +128,11 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	if err != nil {
 		log.Println(err.Error())
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-		// return "{\"error\": \"" + err.Error() + "\"}"
 	} else {
 		serv.ResponseBuilder().SetResponseCode(200)
-		// jsonResp, err = json.Marshal(&person)
-		// if err != nil {
-		// 	log.Println(err.Error())
-		// 	serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-		// 	// return "{\"error\": \"" + err.Error() + "\"}"
-		// }
+
 	}
-	// return string(jsonResp)
+	return
 }
 
 //*************Message Service Methods ***************
