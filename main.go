@@ -2,7 +2,7 @@ package main
 
 import (
 	"code.google.com/p/gorest"
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
@@ -97,19 +97,14 @@ func (serv CircleService) GetCircles() string {
 
 //*************Authentication Service Methods ***************
 func (serv AuthenticateService) RegisterUser(posted string) {
-	var str []string
+	//var str []string
 	// var jsonResp []byte
-	str = strings.Split(posted, "&")
-	useremail := strings.SplitAfter(str[0], "=")
-	password := strings.SplitAfter(str[1], "=")
-	_, err := Authenticate.Login(useremail[1], password[1])
-	if err != nil {
-		log.Println(err.Error())
-		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-	} else {
-		serv.ResponseBuilder().SetResponseCode(200)
-	}
-	return
+  fmt.Println(posted)
+  jsObject, err := json.Marshal(posted)
+  if err != nil {
+    log.Println(err.Error())
+  }
+  fmt.Println(jsObject)
 }
 
 func (serv AuthenticateService) CreateUser(uemail, pass string) string {

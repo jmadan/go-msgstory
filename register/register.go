@@ -7,7 +7,9 @@ import (
 )
 
 func Register(useremail, password string) {
-	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
+	//db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/msgstory")
+  dburl := os.Getenv("CLEARDB_DATABASE_URL")
+	db, err := sql.Open("mysql", dburl[8:])
 	if err != nil {
 		panic(err.Error())
 	}
