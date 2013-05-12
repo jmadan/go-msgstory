@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"labix.org/v2/mgo"
+  "os"
 )
 
 func Register(useremail, password string) {
