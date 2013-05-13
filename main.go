@@ -55,19 +55,13 @@ type CircleService struct {
 type LocationService struct {
 	gorest.RestService     `root:"/location/" consumes:"application/json" produces:"application/json"`
 	getLocations           gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
-	getLocationsWithLatLng gorest.EndPoint `method:"GET" path:"/coordinates/{lat:float64}/{lng:float64}" output:"string"`
+	getLocationsWithLatLng gorest.EndPoint `method:"GET" path:"/coordinates/{lat:string}/{lng:string}" output:"string"`
 }
 
 // ************Location Service Methods ***********
 func (serv LocationService) GetLocations(place string) string {
 	fmt.Println(place)
 	resp := Glocation.GetVenues("Chelsea,London")
-	// responseStr := "{\"locations\":["
-	// for _, v := range str {
-	// 	responseStr += "{\"id\": \"" + v.Id + "\","
-	// 	responseStr += "\"name\": \"" + v.Name + "\"},"
-	// }
-	// responseStr += "]}"
 	serv.ResponseBuilder().SetResponseCode(200)
 	return resp
 }
