@@ -136,12 +136,14 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	password := strings.SplitAfter(str[1], "=")
 	user, err := Authenticate.Login(useremail[1], password[1])
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Dooh: " + err.Error())
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	} else {
-		log.Println(user.Email)
-		serv.ResponseBuilder().SetResponseCode(200).Created("User is Authenticated")
+		log.Println("Woohoo: " + user.Email)
+		serv.ResponseBuilder().SetResponseCode(200).Created("http://floating-ocean.herokuapp.com/")
 	}
+	log.Print("End of Login Method call")
+	getResponse()
 	return
 }
 
@@ -192,4 +194,8 @@ func main() {
 	// http.HandleFunc("/tempurl", getData)
 	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	// User.GetAll()
+}
+
+func getResponse() string {
+	return "All is Well"
 }
