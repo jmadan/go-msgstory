@@ -2,7 +2,6 @@ package main
 
 import (
 	"code.google.com/p/gorest"
-	"encoding/json"
 	"fmt"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
@@ -16,6 +15,11 @@ import (
 	"strings"
 )
 
+type FormData struct {
+	UserName string
+	UserPass string
+}
+
 type AppService struct {
 	gorest.RestService `root:"/" consumes:"application/json" produces:"application/json"`
 	getApp             gorest.EndPoint `method:"GET" path:"/" output:"string"`
@@ -23,8 +27,8 @@ type AppService struct {
 
 type UserService struct {
 	gorest.RestService `root:"/user-service/" consumes:"application/json" produces:"application/json"`
-	getUser            gorest.EndPoint `method:"GET" path:"/user" output:"string"`
-	getAll             gorest.EndPoint `method:"GET" path:"/all" output:"string"`
+	// getUser            gorest.EndPoint `method:"GET" path:"/user/{userid:string}" output:"string"`
+	getAll gorest.EndPoint `method:"GET" path:"/all" output:"string"`
 }
 
 type ConversationService struct {
@@ -91,14 +95,32 @@ func (serv CircleService) GetCircles() string {
 
 //*************Authentication Service Methods ***************
 func (serv AuthenticateService) RegisterUser(posted string) {
-	//var str []string
-	// var jsonResp []byte
-  fmt.Println(posted)
-  jsObject, err := json.Marshal(posted)
-  if err != nil {
-    log.Println(err.Error())
-  }
-  fmt.Println(jsObject)
+	var formData []string
+	var questionmark int
+	var jsonObject string
+	if strings.Contains(posted, "?") {
+		questionmark = strings.Index(posted, "?")
+	}
+
+	if questionmark == 0 {
+		formData = strings.Split(posted[1:], "&")
+	} else {
+		formData = strings.Split(posted, "&")
+	}
+
+	jsonObject = "{"
+	for i := 0; i < len(formData); i++ {
+		jsonObject += "\"" + formData[i][:strings.Index(formData[i], "=")] + "\":\"" + formData[i][strings.Index(formData[i], "=")+1:] + "\""
+		if i != len(formData)-1 {
+			jsonObject += ","
+		}
+	}
+	jsonObject += "}"
+	// jsonObject = "{\"" + formData[0][:strings.Index(formData[0], "=")] + "\":\"" + formData[0][strings.Index(formData[0], "=")+1:] + "\""
+	// jsonObject += "\"" + formData[1][:strings.Index(formData[1], "=")] + "\":\"" + formData[1][strings.Index(formData[1], "=")+1:] + "\"}"
+
+	log.Println(jsonObject)
+
 }
 
 func (serv AuthenticateService) CreateUser(uemail, pass string) string {
@@ -112,13 +134,13 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
-	_, err := Authenticate.Login(useremail[1], password[1])
+	user, err := Authenticate.Login(useremail[1], password[1])
 	if err != nil {
 		log.Println(err.Error())
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	} else {
-		serv.ResponseBuilder().SetResponseCode(200)
-
+		log.Println(user.Email)
+		serv.ResponseBuilder().SetResponseCode(200).Created("User is Authenticated")
 	}
 	return
 }
@@ -134,12 +156,13 @@ func (serv MsgService) PostMessage(posted string) {
 }
 
 //*************User Service Methods ***************
-func (serv UserService) GetUser() string {
-	per := "{User:[" + User.GetUser("asd") + "]}"
-	return per
-	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-	// return
-}
+// func (serv UserService) GetUser(userid string) string {
+// 	user := User.User{}
+// 	user.
+// 	per := "{User:[" + User.User.GetUser() + "]}"
+// 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+// 	return per
+// }
 
 func (serv UserService) GetAll() string {
 	fmt.Print("I am here")
