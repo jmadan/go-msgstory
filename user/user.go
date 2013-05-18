@@ -54,7 +54,7 @@ func (u *User) GetMessages() string {
 	return string(str)
 }
 
-func GetUser(name string) string {
+func (u *User) GetUser() string {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
 		panic(err.Error())
@@ -64,7 +64,7 @@ func GetUser(name string) string {
 	c := session.DB("msgme").C("jove")
 
 	result := User{}
-	err = c.Find(bson.M{"email": "test@email.com"}).One(&result)
+	err = c.Find(bson.M{"email": u.GetEmail()}).One(&result)
 	if err != nil {
 		panic(err)
 	}
