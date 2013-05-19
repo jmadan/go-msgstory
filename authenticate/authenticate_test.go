@@ -8,7 +8,7 @@ func Test_Authorize_Incorrect_Credentials(t *testing.T) {
 
 	authenticate := Authenticate{"a@a.com", "something", 0, false}
 	authenticate.authorize()
-	if authenticate.isAuthenticated {
+	if authenticate.IsAuthenticated {
 		t.Log("Test_Authorize_Incorrect_Credentials Failed")
 		t.Fail()
 	} else {
@@ -19,7 +19,7 @@ func Test_Authorize_Incorrect_Credentials(t *testing.T) {
 func Test_Authorize_Correct_Credentials(t *testing.T) {
 	authenticate := Authenticate{"jasdeepm@gmail.com", "98036054", 0, false}
 	authenticate.authorize()
-	if authenticate.isAuthenticated {
+	if authenticate.IsAuthenticated {
 		t.Log("PASSED")
 	} else {
 		t.Log("Test_Authorize_Correct_Credentials Failed")
@@ -29,7 +29,7 @@ func Test_Authorize_Correct_Credentials(t *testing.T) {
 
 func Test_Login_Method(t *testing.T) {
 	auth := Login("jasdeepm@gmail.com", "98036054")
-	if auth.isAuthenticated {
+	if auth.IsAuthenticated {
 		t.Log("Login Method PASSED")
 	} else {
 		t.Log("Login Method FAILED")

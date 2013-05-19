@@ -9,10 +9,10 @@ import (
 )
 
 type Authenticate struct {
-	email           string
-	password        string
-	user_id         int
-	isAuthenticated bool
+	Email           string
+	Password        string
+	User_id         int
+	IsAuthenticated bool
 }
 
 //private function to verify credentials with MySQL
@@ -33,14 +33,13 @@ func (a *Authenticate) authorize() {
 	defer stmtOut.Close()
 
 	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
-	err = stmtOut.QueryRow(a.email, a.password).Scan(&a.user_id, &a.email)
+	err = stmtOut.QueryRow(a.Email, a.Password).Scan(&a.User_id, &a.Email)
 
 	if err != nil {
 		log.Print("stmtExecution: " + err.Error())
-		a.isAuthenticated = false
+		a.IsAuthenticated = false
 	} else {
-		a.isAuthenticated = true
-		log.Println(a.user_id)
+		a.IsAuthenticated = true
 	}
 }
 
