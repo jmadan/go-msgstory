@@ -136,8 +136,8 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
 	auth := Authenticate.Login(useremail[1], password[1])
-	if auth.isAuthenticated {
-		serv.ResponseBuilder().SetResponseCode(200).Location("http://floating-ocean.herokuapp.com/user/getuser/" + string(auth.user_id))
+	if auth.IsAuthenticated {
+		serv.ResponseBuilder().SetResponseCode(200).Location("http://floating-ocean.herokuapp.com/user/getuser/" + string(auth.User_id))
 	} else {
 		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 		getResponse()
