@@ -26,9 +26,9 @@ type AppService struct {
 }
 
 type UserService struct {
-	gorest.RestService `root:"/user-service/" consumes:"application/json" produces:"application/json"`
-	// getUser            gorest.EndPoint `method:"GET" path:"/user/{userid:string}" output:"string"`
-	getAll gorest.EndPoint `method:"GET" path:"/all" output:"string"`
+	gorest.RestService `root:"/user/" consumes:"application/json" produces:"application/json"`
+	getUser            gorest.EndPoint `method:"GET" path:"/getuser/{userid:string}" output:"string"`
+	getAll             gorest.EndPoint `method:"GET" path:"/all" output:"string"`
 }
 
 type ConversationService struct {
@@ -130,20 +130,19 @@ func (serv AuthenticateService) CreateUser(uemail, pass string) string {
 
 func (serv AuthenticateService) LoginUser(posted string) {
 	var str []string
+	log.Println(posted)
 	// var jsonResp []byte
 	str = strings.Split(posted, "&")
 	useremail := strings.SplitAfter(str[0], "=")
 	password := strings.SplitAfter(str[1], "=")
-	user, err := Authenticate.Login(useremail[1], password[1])
-	if err != nil {
-		log.Println("Dooh: " + err.Error())
-		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	auth := Authenticate.Login(useremail[1], password[1])
+	if auth.isAuthenticated {
+		serv.ResponseBuilder().SetResponseCode(200).Location("http://floating-ocean.herokuapp.com/user/getuser/" + string(auth.user_id))
 	} else {
-		log.Println("Woohoo: " + user.Email)
-		serv.ResponseBuilder().SetResponseCode(200).Created("http://floating-ocean.herokuapp.com/")
+		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+		getResponse()
 	}
-	log.Print("End of Login Method call")
-	getResponse()
+
 	return
 }
 
@@ -158,13 +157,12 @@ func (serv MsgService) PostMessage(posted string) {
 }
 
 //*************User Service Methods ***************
-// func (serv UserService) GetUser(userid string) string {
-// 	user := User.User{}
-// 	user.
-// 	per := "{User:[" + User.User.GetUser() + "]}"
-// 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-// 	return per
-// }
+func (serv UserService) GetUser(userid string) string {
+	// user := User.User{}
+	// per := "{User:[" + User.User.GetUser() + "]}"
+	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	return "Some User"
+}
 
 func (serv UserService) GetAll() string {
 	fmt.Print("I am here")
