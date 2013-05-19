@@ -195,5 +195,6 @@ func main() {
 }
 
 func getResponse() string {
+	log.Println("something works")
 	return "All is Well"
 }
