@@ -36,3 +36,17 @@ func Test_GetUser(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func Test_CreateUserLogin(t *testing.T) {
+	useremail := "test@test.com"
+	password := "password"
+	user_id := CreateUserLogin(useremail, password)
+	uid := getUserByEmail(useremail)
+
+	if uid == user_id {
+		t.Log("Test_CreateUserLogn PASSED")
+	} else {
+		t.Fail()
+		t.Log("Test_CreateUserLogn FAILED")
+	}
+}

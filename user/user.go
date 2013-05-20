@@ -1,8 +1,10 @@
 package user
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	Message "github.com/jmadan/go-msgstory/message"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -145,9 +147,10 @@ func (u *User) GetByHandle() User {
 }
 
 func (u *User) CreateUser() bool {
+
 	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("Phat gayee : " + err.Error())
 	}
 
 	session.SetMode(mgo.Monotonic, true)
@@ -159,4 +162,68 @@ func (u *User) CreateUser() bool {
 		return false
 	}
 	return true
+}
+
+func CreateUserLogin(useremail, password string) string {
+	dburl := os.Getenv("DATABASE_URL")
+	// "mysql", "root:password@tcp(localhost:3306)/msgstory"
+	db, err := sql.Open("mysql", dburl[8:])
+	if err != nil {
+		log.Fatal("Phat Gayee : " + err.Error())
+	}
+	defer db.Close()
+
+	stmtIns, err := db.Prepare("INSERT INTO USERS (USEREMAIL,PASSWORD) VALUES (?,?)")
+	if err != nil {
+		log.Fatal("stmtError :" + err.Error())
+	}
+	defer stmtIns.Close()
+
+	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
+	_, err = stmtIns.Exec(useremail, password)
+	if err != nil {
+		log.Print("stmtExecution: " + err.Error())
+	}
+
+	var userid string
+	stmtOut, err := db.Prepare("SELECT USER_ID FROM USERS WHERE USEREMAIL=?")
+	if err != nil {
+		log.Println("stmtError: " + err.Error())
+	}
+
+	err = stmtOut.QueryRow(useremail).Scan(&userid)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	return userid
+}
+
+func getUserByEmail(user_email string) string {
+	dburl := os.Getenv("DATABASE_URL")
+	db, err := sql.Open("mysql", dburl[8:])
+	if err != nil {
+		log.Fatal("Phat Gayee : " + err.Error())
+	}
+	defer db.Close()
+
+	stmtOut, err := db.Prepare("SELECT USER_ID FROM USERS WHERE USEREMAIL = ?")
+	if err != nil {
+		log.Fatal("stmtError :" + err.Error())
+	}
+	defer stmtOut.Close()
+
+	var uid string
+
+	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
+	err = stmtOut.QueryRow(user_email).Scan(&uid)
+
+	if err != nil {
+		log.Print("stmtExecution: " + err.Error())
+		return err.Error()
+	} else {
+		return uid
+	}
+
+	return uid
 }
