@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -29,6 +30,8 @@ type UserService struct {
 	gorest.RestService `root:"/user/" consumes:"application/json" produces:"application/json"`
 	getUser            gorest.EndPoint `method:"GET" path:"/getuser/{userid:string}" output:"string"`
 	getAll             gorest.EndPoint `method:"GET" path:"/all" output:"string"`
+	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
+	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 }
 
 type ConversationService struct {
@@ -45,8 +48,6 @@ type MsgService struct {
 
 type AuthenticateService struct {
 	gorest.RestService `root:"/auth/" consumes:"application/json" produces:"application/json"`
-	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
-	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
 }
 
@@ -94,39 +95,6 @@ func (serv CircleService) GetCircles() string {
 }
 
 //*************Authentication Service Methods ***************
-func (serv AuthenticateService) RegisterUser(posted string) {
-	var formData []string
-	var questionmark int
-	var jsonObject string
-	if strings.Contains(posted, "?") {
-		questionmark = strings.Index(posted, "?")
-	}
-
-	if questionmark == 0 {
-		formData = strings.Split(posted[1:], "&")
-	} else {
-		formData = strings.Split(posted, "&")
-	}
-
-	jsonObject = "{"
-	for i := 0; i < len(formData); i++ {
-		jsonObject += "\"" + formData[i][:strings.Index(formData[i], "=")] + "\":\"" + formData[i][strings.Index(formData[i], "=")+1:] + "\""
-		if i != len(formData)-1 {
-			jsonObject += ","
-		}
-	}
-	jsonObject += "}"
-	// jsonObject = "{\"" + formData[0][:strings.Index(formData[0], "=")] + "\":\"" + formData[0][strings.Index(formData[0], "=")+1:] + "\""
-	// jsonObject += "\"" + formData[1][:strings.Index(formData[1], "=")] + "\":\"" + formData[1][strings.Index(formData[1], "=")+1:] + "\"}"
-
-	log.Println(jsonObject)
-
-}
-
-func (serv AuthenticateService) CreateUser(uemail, pass string) string {
-	Register.Register(uemail, pass)
-	return "Executed!!!"
-}
 
 func (serv AuthenticateService) LoginUser(posted string) {
 	var str []string
@@ -137,10 +105,14 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	password := strings.SplitAfter(str[1], "=")
 	auth := Authenticate.Login(useremail[1], password[1])
 	if auth.IsAuthenticated {
-		serv.ResponseBuilder().SetResponseCode(200).Write([]byte("HOLA AMIGO"))
+		user := User.User{}
+		user.UserId = auth.User_id
+		user.Email = auth.Email
+		serv.ResponseBuilder().SetResponseCode(200).Write([]byte(user.GetUser()))
 		return
 	} else {
-		serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride([]byte("Not Found"))
+		res := "{\"error\":\"authentication failed\"}"
+		serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride([]byte(res))
 		return
 	}
 }
@@ -156,6 +128,45 @@ func (serv MsgService) PostMessage(posted string) {
 }
 
 //*************User Service Methods ***************
+func (serv UserService) RegisterUser(posted string) {
+	var formData []string
+	var questionmark int
+	// var jsonObject string
+	if strings.Contains(posted, "?") {
+		questionmark = strings.Index(posted, "?")
+	}
+
+	if questionmark == 0 {
+		formData = strings.Split(posted[1:], "&")
+	} else {
+		formData = strings.Split(posted, "&")
+	}
+
+	// jsonObject = "{"
+	// for i := 0; i < len(formData); i++ {
+	// 	jsonObject += "\"" + formData[i][:strings.Index(formData[i], "=")] + "\":\"" + formData[i][strings.Index(formData[i], "=")+1:] + "\""
+	// 	if i != len(formData)-1 {
+	// 		jsonObject += ","
+	// 	}
+	// }
+	// jsonObject += "}"
+	// jsonObject = "{\"" + formData[0][:strings.Index(formData[0], "=")] + "\":\"" + formData[0][strings.Index(formData[0], "=")+1:] + "\""
+	// jsonObject += "\"" + formData[1][:strings.Index(formData[1], "=")] + "\":\"" + formData[1][strings.Index(formData[1], "=")+1:] + "\"}"
+	user_id := User.CreateUserLogin(formData[1][strings.Index(formData[1], "=")+1:], formData[3][strings.Index(formData[3], "=")+1:])
+	user := User.User{}
+	user.UserId, _ = strconv.Atoi(user_id)
+	user.Name = formData[0][strings.Index(formData[0], "=")+1:]
+	user.Email = formData[1][strings.Index(formData[1], "=")+1:]
+	user.Handle = formData[2][strings.Index(formData[2], "=")+1:]
+	user.CreateUser()
+	log.Println(user)
+}
+
+func (serv UserService) CreateUser(uemail, pass string) string {
+	Register.Register(uemail, pass)
+	return "Executed!!!"
+}
+
 func (serv UserService) GetUser(userid string) string {
 	// user := User.User{}
 	// per := "{User:[" + User.User.GetUser() + "]}"
