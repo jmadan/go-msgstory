@@ -115,8 +115,8 @@ func getLocations(FSqrUrl string) string {
 	}
 	defer res.Body.Close()
 	str, _ := ioutil.ReadAll(res.Body)
-	Venues := getJsonVenues(str)
-	return Venues
+	// Venues := getJsonVenues(str)
+	return string(str)
 }
 
 func getJsonVenues(resp []byte) string {
