@@ -101,7 +101,7 @@ func GetVenues(near string) string {
 
 func GetVenuesWithLatitudeAndLongitude(lt, lg string) string {
 	var FSqrUrl string
-	FSqrUrl = "https://api.foursquare.com/v2/venues/search?v=20130417&ll=" + lt + "," + lg + "&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET") + "\""
+	FSqrUrl = "https://api.foursquare.com/v2/venues/search?v=20130417&ll=" + lt + "," + lg + "&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET")
 	// FSqrUrl = strings.Replace(FSqrUrl, "<lat>", lt, -1)
 	// FSqrUrl = strings.Replace(FSqrUrl, "<lng>", lg, -1)
 
