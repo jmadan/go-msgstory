@@ -1,22 +1,33 @@
 package circle
 
 import (
+	"fmt"
 	"testing"
+	"time"
 )
 
-func Test_IfPublicCircleExistsForUsers(t *testing.T) {
-	var userCircles []string
-	userCircles = GetUserCircles("something")
-	var test bool
-	for _, v := range userCircles {
-		if v == "Public" {
-			test = true
-		}
-	}
-	if test {
-		t.Log("PASSED")
-	} else {
-		t.Error("Test_IfPublicCircleExistsForUsers failed")
-	}
+var grp = Circle{
+	Name:        "Tapori",
+	Description: "Test Group",
+	CreatorID:   "011",
+	CreatedOn:   time.Now().String(),
+	Members:     []string{"011"},
+}
 
+func Test_MakeCircle(t *testing.T) {
+	test_circle, err := grp.makeCircle()
+	if test_circle {
+		t.Log("Test_MakeCircle PASSED")
+	} else {
+		t.Log(err.Error())
+		t.Log("Test_MakeCircle Failed")
+		t.Fail()
+	}
+}
+
+func Test_CircleExists(t *testing.T) {
+	exists := grp.CircleExists()
+	if exists {
+		fmt.Println(exists)
+	}
 }
