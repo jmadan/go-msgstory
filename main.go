@@ -85,15 +85,15 @@ func (serv LocationService) GetLocationsWithLatLng(lat, lng string) string {
 
 //*************Circle Service Methods ***************
 func (serv CircleService) CreateCircle(posted string) {
-	var str []string
-	str = strings.Split(posted, "=")
-	msg, err := Circle.CreateCircle(str[1], "", "", nil)
-	if err != nil {
-		log.Println(err)
-	} else {
-		fmt.Println(msg)
-		serv.ResponseBuilder().SetResponseCode(200)
-	}
+	// var str []string
+	// str = strings.Split(posted, "=")
+	// msg, err := Circle.CreateCircle(str[1], "", "", nil)
+	// if err != nil {
+	// 	log.Println(err)
+	// } else {
+	// 	fmt.Println(msg)
+	// 	serv.ResponseBuilder().SetResponseCode(200)
+	// }
 }
 
 func (serv CircleService) GetCircles() string {
