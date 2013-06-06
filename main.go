@@ -27,22 +27,28 @@ type AppService struct {
 }
 
 type UserService struct {
-	gorest.RestService `root:"/user/" consumes:"application/json" produces:"application/json"`
-	getUser            gorest.EndPoint `method:"GET" path:"/getuser/{userid:string}" output:"string"`
-	getAll             gorest.EndPoint `method:"GET" path:"/all" output:"string"`
-	registerUser       gorest.EndPoint `method:"POST" path:"/register/" postdata:"string"`
-	createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
+	gorest.RestService `root:"/users/" consumes:"application/json" produces:"application/json"`
+
+	getUser      gorest.EndPoint `method:"GET" path:"/{userid:string}" output:"string"`
+	getAll       gorest.EndPoint `method:"GET" path:"/" output:"string"`
+	registerUser gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
+	// createUser         gorest.EndPoint `method:"GET" path:"/new/{uemail:string}/{pass:string}" output:"string"`
 }
 
 type ConversationService struct {
-	gorest.RestService `root:"/convoservice/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/conversations/" consumes:"application/json" produces:"application/json"`
 
-	buildConversation gorest.EndPoint `method:"GET" path:"/buildconversation/{convoid:string}" output:"[]byte"`
+	createConvo   gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
+	getAllConvo   gorest.EndPoint `method:"GET" path:"/{placeId:string}" output:"[]byte"`
+	getConvo      gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"[]byte"`
+	putMessage    gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
+	deleteConvo   gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
+	deleteMessage gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
 }
 
 type MsgService struct {
-	gorest.RestService `root:"/message/" consumes:"application/json" produces:"application/json"`
-	getMessage         gorest.EndPoint `method:"GET" path:"/getmessage" output:"string"`
+	gorest.RestService `root:"/messages/" consumes:"application/json" produces:"application/json"`
+	getMessage         gorest.EndPoint `method:"GET" path:"/" output:"string"`
 	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
 }
 
@@ -124,7 +130,7 @@ func (serv MsgService) GetMessage() string {
 }
 
 func (serv MsgService) PostMessage(posted string) {
-	Mesiji.PostIt(posted)
+	Mesiji.Save_Message(posted)
 }
 
 //*************User Service Methods ***************
@@ -194,7 +200,7 @@ func main() {
 	log.Println(os.Getenv("PORT"))
 	gorest.RegisterService(new(AppService))
 	gorest.RegisterService(new(UserService))
-	gorest.RegisterService(new(MsgService))
+	// gorest.RegisterService(new(MsgService))
 	gorest.RegisterService(new(AuthenticateService))
 	gorest.RegisterService(new(CircleService))
 	gorest.RegisterService(new(LocationService))

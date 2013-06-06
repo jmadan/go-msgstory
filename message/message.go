@@ -28,7 +28,7 @@ func (M *Message) JsonToMsg(msgtext string) {
 	}
 }
 
-func Post_Message(msgtext string) bool {
+func Save_Message(msgtext string) bool {
 	var tempMsg Message
 	tempMsg.JsonToMsg(msgtext)
 
