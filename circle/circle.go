@@ -5,11 +5,9 @@ import (
 	"errors"
 	"fmt"
 	Connection "github.com/jmadan/go-msgstory/connection"
-	// Connection "go-msgstory/connection"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
-	"time"
 )
 
 type Circle struct {
