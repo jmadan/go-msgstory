@@ -39,7 +39,7 @@ type ConversationService struct {
 	gorest.RestService `root:"/conversations/" consumes:"application/json" produces:"application/json"`
 
 	createConvo   gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
-	getAllConvo   gorest.EndPoint `method:"GET" path:"/{placeId:string}" output:"string"`
+	getAllConvo   gorest.EndPoint `method:"GET" path:"/all/{placeId:string}" output:"string"`
 	getConvo      gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
 	putMessage    gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
 	deleteConvo   gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
