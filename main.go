@@ -39,8 +39,8 @@ type ConversationService struct {
 	gorest.RestService `root:"/conversations/" consumes:"application/json" produces:"application/json"`
 
 	createConvo   gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
-	getAllConvo   gorest.EndPoint `method:"GET" path:"/{placeId:string}" output:"[]byte"`
-	getConvo      gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"[]byte"`
+	getAllConvo   gorest.EndPoint `method:"GET" path:"/{placeId:string}" output:"string"`
+	getConvo      gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
 	putMessage    gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
 	deleteConvo   gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
 	deleteMessage gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
@@ -68,6 +68,23 @@ type LocationService struct {
 	getLocations           gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
 	getLocationsWithLatLng gorest.EndPoint `method:"GET" path:"/coordinates/{lat:string}/{lng:string}" output:"string"`
 }
+
+//*************Conversation Service Methods ***********
+func (serv ConversationService) CreateConvo(posted string) {}
+
+func (serv ConversationService) GetAllConvo(locationId string) string {
+	return "You are requesting all conversations"
+}
+
+func (serv ConversationService) GetConvo(convoId string) string {
+	return "You are requesting a conversation"
+}
+
+func (serv ConversationService) PutMessage(posted, convoId string) {}
+
+func (serv ConversationService) DeleteConvo(convoId string) {}
+
+func (serv ConversationService) DeleteMessage(convoId, msgId string) {}
 
 // ************Location Service Methods ***********
 func (serv LocationService) GetLocations(place string) string {
@@ -200,6 +217,7 @@ func main() {
 	log.Println(os.Getenv("PORT"))
 	gorest.RegisterService(new(AppService))
 	gorest.RegisterService(new(UserService))
+	gorest.RegisterService(new(ConversationService))
 	// gorest.RegisterService(new(MsgService))
 	gorest.RegisterService(new(AuthenticateService))
 	gorest.RegisterService(new(CircleService))
