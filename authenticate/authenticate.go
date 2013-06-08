@@ -9,14 +9,14 @@ import (
 )
 
 type Authenticate struct {
-	Email           string
-	Password        string
-	User_id         int
-	IsAuthenticated bool
+	Email           string `json:"email" bson:"email"`
+	Password        string `json:"password" bson:"password"`
+	User_id         int    `json:"userid" bson:"userid"`
+	IsAuthenticated bool   `json:"isauthenticated" bson:"isauthenticated"`
 }
 
 //private function to verify credentials with MySQL
-func (a *Authenticate) authorize() {
+func (a *Authenticate) Authorize() {
 	// var person User.User
 	dburl := os.Getenv("DATABASE_URL")
 	// "mysql", "root:password@tcp(localhost:3306)/msgstory"
@@ -46,6 +46,6 @@ func (a *Authenticate) authorize() {
 //Login function to check users credentials
 func Login(email, password string) Authenticate {
 	a := Authenticate{email, password, 0, false}
-	a.authorize()
+	a.Authorize()
 	return a
 }
