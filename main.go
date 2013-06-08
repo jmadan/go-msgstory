@@ -2,6 +2,7 @@ package main
 
 import (
 	"code.google.com/p/gorest"
+	"encoding/json"
 	"fmt"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
@@ -54,7 +55,7 @@ type MsgService struct {
 
 type AuthenticateService struct {
 	gorest.RestService `root:"/auth/" consumes:"application/json" produces:"application/json"`
-	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
+	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string" `
 }
 
 type CircleService struct {
@@ -70,7 +71,9 @@ type LocationService struct {
 }
 
 //*************Conversation Service Methods ***********
-func (serv ConversationService) CreateConvo(posted string) {}
+func (serv ConversationService) CreateConvo(posted string) {
+	fmt.Println(posted)
+}
 
 func (serv ConversationService) GetAllConvo(locationId string) string {
 	return "You are requesting all conversations"
@@ -121,23 +124,26 @@ func (serv CircleService) GetCircles() string {
 
 func (serv AuthenticateService) LoginUser(posted string) {
 	var str []string
-	log.Println(posted)
-	// var jsonResp []byte
-	str = strings.Split(posted, "&")
-	useremail := strings.SplitAfter(str[0], "=")
-	password := strings.SplitAfter(str[1], "=")
-	auth := Authenticate.Login(useremail[1], password[1])
-	if auth.IsAuthenticated {
-		user := User.User{}
-		user.UserId = auth.User_id
-		user.Email = auth.Email
-		serv.ResponseBuilder().SetResponseCode(200).Write([]byte(user.GetUser()))
+	str = strings.Split(posted, "=")
+	auth := Authenticate.Authenticate{}
+	user := User.User{}
+	err := json.Unmarshal([]byte(str[1]), &auth)
+	if err != nil {
+		log.Println(err.Error())
+		serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride(nil)
 		return
 	} else {
-		res := "{\"error\":\"authentication failed\"}"
-		serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride([]byte(res))
+		auth.Authorize
+		user.SetEmail(auth.Email)
+		user.SetUid(auth.User_id)
+		serv.ResponseBuilder().SetResponseCode(200).Write([]byte(user.GetUser()))
 		return
 	}
+
+	// 	// res := "{\"error\":\"authentication failed\"}"
+	// 	// serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride([]byte(res))
+	// 	// return
+	// }
 }
 
 //*************Message Service Methods ***************
