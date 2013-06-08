@@ -1,1 +1,1 @@
-web: msgstory
+web: go-msgstory
