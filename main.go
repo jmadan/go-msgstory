@@ -133,7 +133,7 @@ func (serv AuthenticateService) LoginUser(posted string) {
 		serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride(nil)
 		return
 	} else {
-		auth.Authorize
+		auth.Authorize()
 		user.SetEmail(auth.Email)
 		user.SetUid(auth.User_id)
 		serv.ResponseBuilder().SetResponseCode(200).Write([]byte(user.GetUser()))
