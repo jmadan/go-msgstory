@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	Connection "github.com/jmadan/go-msgstory/connection"
 	Message "github.com/jmadan/go-msgstory/message"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -14,6 +15,7 @@ import (
 
 type User struct {
 	UserId int    `json:"userid" bson:"userid"`
+	Uid    int    `json:"uid" bson:"uid"`
 	Name   string `json:"name" bson:"name"`
 	//	Age         int       `json:"age" bson:"age"`
 	Email       string `json:"email" bson:"email"`
@@ -28,12 +30,21 @@ type rels struct {
 
 type JSONUser struct {
 	UserId int    `json:"userid" bson:"userid"`
+	Uid    int    `json:"uid" bson:"uid"`
 	Name   string `json:"name" bson:"name"`
 	// Age         int    `json:"age" bson:"age"`
 	Email       string `json:"email" bson:"email"`
 	Handle      string `json:"handle" bson:"handle"`
 	PhoneNumber string `json:"phone" bson:"phone"`
 	relations   rels   `json:"relations" bson:"relations"`
+}
+
+func (u *User) SetEmail(email string) {
+	u.Email = email
+}
+
+func (u *User) SetUid(id int) {
+	u.Uid = id
 }
 
 func (u *User) GetName() string {
@@ -57,16 +68,13 @@ func (u *User) GetMessages() string {
 }
 
 func (u *User) GetUser() string {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err.Error())
-	}
+	dbSession := Connection.GetDBSession()
 
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("jove")
+	dbSession.SetMode(mgo.Monotonic, true)
+	c := dbSession.DB("msgme").C("jove")
 
 	result := User{}
-	err = c.Find(bson.M{"email": u.GetEmail()}).One(&result)
+	err := c.Find(bson.M{"email": u.Email, "uid": u.Uid}).One(&result)
 	if err != nil {
 		panic(err)
 	}
@@ -98,6 +106,7 @@ func GetAll() string {
 func (u *User) MarshalJSON() ([]byte, error) {
 	jsonUser := JSONUser{
 		u.UserId,
+		u.Uid,
 		u.Name,
 		u.Email,
 		u.Handle,
