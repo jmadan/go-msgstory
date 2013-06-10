@@ -86,7 +86,7 @@ func (serv ConversationService) CreateConvo(posted string) {
 		status = conv.CreateConversation()
 	}
 	if status == "201" {
-		serv.ResponseBuilder().SetResponseCode(200).Write([]byte())
+		serv.ResponseBuilder().SetResponseCode(200).Write([]byte("something to ponder"))
 	}
 
 }
