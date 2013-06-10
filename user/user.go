@@ -11,6 +11,7 @@ import (
 	"labix.org/v2/mgo/bson"
 	"log"
 	"os"
+	"time"
 )
 
 type User struct {
@@ -18,10 +19,11 @@ type User struct {
 	Uid    int    `json:"uid" bson:"uid"`
 	Name   string `json:"name" bson:"name"`
 	//	Age         int       `json:"age" bson:"age"`
-	Email       string `json:"email" bson:"email"`
-	Handle      string `json:"handle" bson:"handle"`
-	PhoneNumber string `json:"phone" bson:"phone"`
-	relations   rels   `json:"relations" bson:"relations"`
+	Email       string    `json:"email" bson:"email"`
+	Handle      string    `json:"handle" bson:"handle"`
+	PhoneNumber string    `json:"phone" bson:"phone"`
+	Relations   rels      `json:"relations" bson:"relations"`
+	Created_on  time.Time `json:"created_on" bson:"created_on"`
 }
 
 type rels struct {
@@ -33,10 +35,11 @@ type JSONUser struct {
 	Uid    int    `json:"uid" bson:"uid"`
 	Name   string `json:"name" bson:"name"`
 	// Age         int    `json:"age" bson:"age"`
-	Email       string `json:"email" bson:"email"`
-	Handle      string `json:"handle" bson:"handle"`
-	PhoneNumber string `json:"phone" bson:"phone"`
-	relations   rels   `json:"relations" bson:"relations"`
+	Email       string    `json:"email" bson:"email"`
+	Handle      string    `json:"handle" bson:"handle"`
+	PhoneNumber string    `json:"phone" bson:"phone"`
+	Relations   rels      `json:"relations" bson:"relations"`
+	Created_on  time.Time `json:"created_on" bson:"created_on"`
 }
 
 func (u *User) SetEmail(email string) {
@@ -60,7 +63,7 @@ func (u *User) GetHandle() string {
 }
 
 func (u *User) GetMessages() string {
-	str, err := json.Marshal(u.relations.Messages)
+	str, err := json.Marshal(u.Relations.Messages)
 	if err != nil {
 		fmt.Println("what the fuck!")
 	}
@@ -111,7 +114,8 @@ func (u *User) MarshalJSON() ([]byte, error) {
 		u.Email,
 		u.Handle,
 		u.PhoneNumber,
-		u.relations,
+		u.Relations,
+		u.Created_on,
 	}
 	return json.Marshal(jsonUser)
 }
