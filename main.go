@@ -6,6 +6,7 @@ import (
 	"fmt"
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
+	Conversation "github.com/jmadan/go-msgstory/conversation"
 	Glocation "github.com/jmadan/go-msgstory/geolocation"
 	Mesiji "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
@@ -72,7 +73,18 @@ type LocationService struct {
 
 //*************Conversation Service Methods ***********
 func (serv ConversationService) CreateConvo(posted string) {
-	fmt.Println(posted)
+	var str []string
+	str = strings.Split(posted, "=")
+	conv := Conversation.Conversation{}
+	err := json.Unmarshal([]byte(str[1]), &conv)
+	if err != nil {
+		log.Println(err.Error())
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
+		return
+	} else {
+
+	}
+
 }
 
 func (serv ConversationService) GetAllConvo(locationId string) string {
@@ -139,11 +151,6 @@ func (serv AuthenticateService) LoginUser(posted string) {
 		serv.ResponseBuilder().SetResponseCode(200).Write([]byte(user.GetUser()))
 		return
 	}
-
-	// 	// res := "{\"error\":\"authentication failed\"}"
-	// 	// serv.ResponseBuilder().SetResponseCode(404).WriteAndOveride([]byte(res))
-	// 	// return
-	// }
 }
 
 //*************Message Service Methods ***************
