@@ -74,6 +74,7 @@ type LocationService struct {
 //*************Conversation Service Methods ***********
 func (serv ConversationService) CreateConvo(posted string) {
 	var str []string
+	var status string
 	str = strings.Split(posted, "=")
 	conv := Conversation.Conversation{}
 	err := json.Unmarshal([]byte(str[1]), &conv)
@@ -82,7 +83,10 @@ func (serv ConversationService) CreateConvo(posted string) {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
 		return
 	} else {
-
+		status = conv.CreateConversation()
+	}
+	if status == "201" {
+		serv.ResponseBuilder().SetResponseCode(200).Write([]byte())
 	}
 
 }
@@ -135,6 +139,7 @@ func (serv CircleService) GetCircles() string {
 //*************Authentication Service Methods ***************
 
 func (serv AuthenticateService) LoginUser(posted string) {
+	fmt.Println(posted)
 	var str []string
 	str = strings.Split(posted, "=")
 	auth := Authenticate.Authenticate{}
