@@ -12,6 +12,7 @@ import (
 	"labix.org/v2/mgo/bson"
 	"log"
 	"os"
+	"strings"
 )
 
 type Conversation struct {
@@ -25,15 +26,10 @@ type Conversation struct {
 }
 
 func (conv *Conversation) CreateConversation() string {
-	// JsonConv, err := json.Marshal(*conv)
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// 	return "422"
-	// }
-
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
-	c := dbSession.DB("msgme").C("conversation")
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	err := c.Insert(&conv)
 	if err != nil {
@@ -45,16 +41,13 @@ func (conv *Conversation) CreateConversation() string {
 }
 
 func GetConversationForLocation(convID string) Conversation {
-	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
-	if err != nil {
-		log.Fatal("Phat gayee : " + err.Error())
-	}
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("conversation")
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	res := Conversation{}
-	err = c.Find(bson.M{"_id": convID}).One(&res)
+	err := c.Find(bson.M{"_id": convID}).One(&res)
 	if err != nil {
 		log.Println("Found Nothing. Something went wrong fetching the Conversation document")
 	}
@@ -62,16 +55,13 @@ func GetConversationForLocation(convID string) Conversation {
 }
 
 func GetConversationForGroup(groupID string) Conversation {
-	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
-	if err != nil {
-		log.Fatal("Phat gayee : " + err.Error())
-	}
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("conversation")
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	res := Conversation{}
-	err = c.Find(bson.M{"Group.Id": groupID}).One(&res)
+	err := c.Find(bson.M{"Group.Id": groupID}).One(&res)
 	if err != nil {
 		log.Println("Found Nothing. Something went wrong fetching the Conversation document")
 	}

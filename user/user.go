@@ -73,16 +73,14 @@ func (u *User) GetMessages() string {
 
 func (u *User) GetUser() string {
 	dbSession := Connection.GetDBSession()
-
 	dbSession.SetMode(mgo.Monotonic, true)
-	dataBase := strings.SplitAfterN(os.Getenv("MONGOHQ_URL"), "/", 3)
-	fmt.Println(dataBase[1])
-	c := dbSession.DB("app15287973").C("jove")
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("jove")
 
 	result := User{}
 	err := c.Find(bson.M{"email": u.Email, "uid": u.Uid}).One(&result)
 	if err != nil {
-		panic(err)
+		log.Println(err.Error())
 	}
 	js, _ := json.Marshal(result)
 	// fmt.Printf("%s", js)
@@ -92,16 +90,13 @@ func (u *User) GetUser() string {
 }
 
 func GetAll() string {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("jove")
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("jove")
 
 	result := []User{}
-	err = c.Find(nil).Limit(10).All(&result)
+	err := c.Find(nil).Limit(10).All(&result)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -124,16 +119,13 @@ func (u *User) MarshalJSON() ([]byte, error) {
 }
 
 func GetByEmailAndUserId(email string, user_id int) (User, error) {
-	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("jove")
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("jove")
 
 	result := User{}
-	err = c.Find(bson.M{"email": email, "userid": user_id}).One(&result)
+	err := c.Find(bson.M{"email": email, "userid": user_id}).One(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -143,16 +135,13 @@ func GetByEmailAndUserId(email string, user_id int) (User, error) {
 }
 
 func (u *User) GetByHandle() User {
-	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("jove")
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("jove")
 
 	result := User{}
-	err = c.Find(bson.M{"handle": u.Handle}).One(&result)
+	err := c.Find(bson.M{"handle": u.Handle}).One(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -164,15 +153,12 @@ func (u *User) GetByHandle() User {
 
 func (u *User) CreateUser() bool {
 
-	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
-	if err != nil {
-		log.Fatal("Phat gayee : " + err.Error())
-	}
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("jove")
 
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("jove")
-
-	err = c.Insert(u)
+	err := c.Insert(u)
 	if err != nil {
 		log.Print(err.Error())
 		return false
@@ -182,7 +168,6 @@ func (u *User) CreateUser() bool {
 
 func CreateUserLogin(useremail, password string) string {
 	dburl := os.Getenv("DATABASE_URL")
-	// "mysql", "root:password@tcp(localhost:3306)/msgstory"
 	db, err := sql.Open("mysql", dburl[8:])
 	if err != nil {
 		log.Fatal("Phat Gayee : " + err.Error())

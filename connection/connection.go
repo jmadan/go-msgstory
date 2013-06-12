@@ -8,7 +8,7 @@ import (
 
 var (
 	mgoSession   *mgo.Session
-	databaseName = "msgme"
+	databaseName = "app15287973"
 )
 
 func GetDBSession() *mgo.Session {
