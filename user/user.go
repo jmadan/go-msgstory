@@ -11,6 +11,7 @@ import (
 	"labix.org/v2/mgo/bson"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -74,7 +75,9 @@ func (u *User) GetUser() string {
 	dbSession := Connection.GetDBSession()
 
 	dbSession.SetMode(mgo.Monotonic, true)
-	c := dbSession.DB("msgme").C("jove")
+	dataBase := strings.SplitAfterN(os.Getenv("MONGOHQ_URL"), "/", 3)
+	fmt.Println(dataBase[1])
+	c := dbSession.DB("app15287973").C("jove")
 
 	result := User{}
 	err := c.Find(bson.M{"email": u.Email, "uid": u.Uid}).One(&result)
