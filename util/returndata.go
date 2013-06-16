@@ -3,7 +3,7 @@ package util
 type ReturnData struct {
 	Success  bool   `json:"success"`
 	ErrorMsg error  `json:"error_message"`
-	JsonData string `json:"json_data"`
+	JsonData []byte `json:"json_data"`
 	Status   string `json:"status"`
 }
 
@@ -11,7 +11,7 @@ func (return_data *ReturnData) GetSuccess() bool {
 	return return_data.Success
 }
 
-func (return_data *ReturnData) GetJsonData() string {
+func (return_data *ReturnData) GetJsonData() []byte {
 	return return_data.JsonData
 }
 
