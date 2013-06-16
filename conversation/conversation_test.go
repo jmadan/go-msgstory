@@ -1,11 +1,11 @@
 package conversation
 
 import (
-	// "fmt"
+	"fmt"
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Location "github.com/jmadan/go-msgstory/geolocation"
-	// Msg "github.com/jmadan/go-msgstory/message"
-	Msg "go-msgstory/message"
+	Msg "github.com/jmadan/go-msgstory/message"
+	// Msg "go-msgstory/message"
 	"testing"
 )
 
@@ -33,16 +33,15 @@ var Loc = Location.GeoLocation{
 }
 var Conv = Conversation{
 	Title:     "This is a test conversation!",
-	Messages:  ,
+	Messages:  []Msg.Message{},
 	Venue:     Loc,
-	Group:     []Circle.Circle{Cir},
+	Circles:   []Circle.Circle{Cir},
 	ConvOwner: "001",
 }
 
 func Test_CreateConversation(t *testing.T) {
-
 	res := Conv.CreateConversation()
-	if res == "201" {
+	if res.Success {
 		t.Log("Test_CreateConversation PASSED")
 	} else {
 		t.Fail()
@@ -50,6 +49,23 @@ func Test_CreateConversation(t *testing.T) {
 	}
 }
 
-func Test_GetConversationForGroup(t *testing.T) {
-
+func Test_GetConversationForLocation(t *testing.T) {
+	res := GetConversationForLocation("4bce6383ef109521bd238486")
+	if res.Success {
+		t.Log("Test_GetConversationForLocation PASSED")
+	} else {
+		t.Fail()
+		t.Log("Test_GetConversationForLocation FAILED")
+	}
 }
+
+// func Test_DeleteConversation(t *testing.T) {
+// 	res := DeleteConversation("51bc529e2ffc2c5db5e9b215")
+// 	if res.Success {
+// 		t.Log("Test_DeleteConversation PASSED")
+// 	} else {
+// 		fmt.Println(res.ErrorMsg)
+// 		t.Fail()
+// 		t.Log("Test_DeleteConversation FAILED")
+// 	}
+// }
