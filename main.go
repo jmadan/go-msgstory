@@ -11,6 +11,7 @@ import (
 	Mesiji "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
 	User "github.com/jmadan/go-msgstory/user"
+	ReturnData "github.com/jmadan/go-msgstory/util"
 	"log"
 	"net/http"
 	"os"
@@ -18,18 +19,13 @@ import (
 	"strings"
 )
 
-type FormData struct {
-	UserName string
-	UserPass string
-}
-
 type AppService struct {
-	gorest.RestService `root:"/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/" consumes:"application/json" produces:"application/json"`
 	getApp             gorest.EndPoint `method:"GET" path:"/" output:"string"`
 }
 
 type UserService struct {
-	gorest.RestService `root:"/users/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/users/" consumes:"application/json" produces:"application/json"`
 
 	getUser      gorest.EndPoint `method:"GET" path:"/{userid:string}" output:"string"`
 	getAll       gorest.EndPoint `method:"GET" path:"/" output:"string"`
@@ -38,43 +34,43 @@ type UserService struct {
 }
 
 type ConversationService struct {
-	gorest.RestService `root:"/conversations/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/conversations/" consumes:"application/json" produces:"application/json"`
 
-	createConvo   gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
-	getAllConvo   gorest.EndPoint `method:"GET" path:"/all/{placeId:string}" output:"string"`
-	getConvo      gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
-	putMessage    gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
-	deleteConvo   gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
-	deleteMessage gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
+	createConversation gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
+	getConvoversations gorest.EndPoint `method:"GET" path:"/all/{placeId:string}" output:"string"`
+	getConvo           gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
+	putMessage         gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
+	deleteConvo        gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
+	deleteMessage      gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
 }
 
 type MsgService struct {
-	gorest.RestService `root:"/messages/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/messages/" consumes:"application/json" produces:"application/json"`
 	getMessage         gorest.EndPoint `method:"GET" path:"/" output:"string"`
 	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
 }
 
 type AuthenticateService struct {
-	gorest.RestService `root:"/auth/" consumes:"application/json" produces:"application/json"`
-	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string" `
+	gorest.RestService `root:"/api/auth/" consumes:"application/json" produces:"application/json"`
+	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
 }
 
 type CircleService struct {
-	gorest.RestService `root:"/circle/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/circle/" consumes:"application/json" produces:"application/json"`
 	createCircle       gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
 	getCircles         gorest.EndPoint `method:"GET" path:"/circles/" output:"string"`
 }
 
 type LocationService struct {
-	gorest.RestService     `root:"/location/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService     `root:"/api/location/" consumes:"application/json" produces:"application/json"`
 	getLocations           gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
 	getLocationsWithLatLng gorest.EndPoint `method:"GET" path:"/coordinates/{lat:string}/{lng:string}" output:"string"`
 }
 
 //*************Conversation Service Methods ***********
-func (serv ConversationService) CreateConvo(posted string) {
+func (serv ConversationService) CreateConversation(posted string) {
+	var data ReturnData.ReturnData
 	var str []string
-	var status string
 	str = strings.Split(posted, "=")
 	conv := Conversation.Conversation{}
 	err := json.Unmarshal([]byte(str[1]), &conv)
@@ -83,16 +79,26 @@ func (serv ConversationService) CreateConvo(posted string) {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
 		return
 	} else {
-		status = conv.CreateConversation()
+		data = conv.CreateConversation()
 	}
-	if status == "201" {
-		serv.ResponseBuilder().SetResponseCode(200).Write([]byte("something to ponder"))
+	jsonResponse, _ := json.Marshal(data)
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(201).Write(jsonResponse)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(jsonResponse)
 	}
-
 }
 
-func (serv ConversationService) GetAllConvo(locationId string) string {
-	return "You are requesting all conversations"
+func (serv ConversationService) GetConversations(locationId string) string {
+	var data ReturnData.ReturnData
+	data = Conversation.GetConversationForLocation(locationId)
+	jsonResponse, _ := json.Marshal(data)
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(200).Write(jsonResponse)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(jsonResponse)
+	}
+	return string(jsonResponse)
 }
 
 func (serv ConversationService) GetConvo(convoId string) string {
