@@ -8,7 +8,7 @@ import (
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Conversation "github.com/jmadan/go-msgstory/conversation"
 	Glocation "github.com/jmadan/go-msgstory/geolocation"
-	Mesiji "github.com/jmadan/go-msgstory/message"
+	Msg "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
 	User "github.com/jmadan/go-msgstory/user"
 	ReturnData "github.com/jmadan/go-msgstory/util"
@@ -36,12 +36,12 @@ type UserService struct {
 type ConversationService struct {
 	gorest.RestService `root:"/api/conversations/" consumes:"application/json" produces:"application/json"`
 
-	createConversation gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
-	getConversations   gorest.EndPoint `method:"GET" path:"/all/{locationId:string}" output:"string"`
-	getConvo           gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
-	putMessage         gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
-	deleteConvo        gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
-	deleteMessage      gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
+	createConversation          gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
+	getConversationsForLocation gorest.EndPoint `method:"GET" path:"/all/{locationId:string}" output:"string"`
+	getConversation             gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
+	saveMessage                 gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
+	deleteConversation          gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
+	deleteMessage               gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
 }
 
 type MsgService struct {
@@ -88,7 +88,7 @@ func (serv ConversationService) CreateConversation(posted string) {
 	}
 }
 
-func (serv ConversationService) GetConversations(locationId string) string {
+func (serv ConversationService) GetConversationsForLocation(locationId string) string {
 	var data ReturnData.ReturnData
 	data = Conversation.GetConversationForLocation(locationId)
 	if data.Success {
@@ -99,13 +99,44 @@ func (serv ConversationService) GetConversations(locationId string) string {
 	return string(data.JsonData)
 }
 
-func (serv ConversationService) GetConvo(convoId string) string {
-	return "You are requesting a conversation"
+func (serv ConversationService) GetConversation(convoId string) string {
+	var data ReturnData.ReturnData
+	data = Conversation.GetConversationForLocation(convoId)
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(200)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
+	}
+	return string(data.JsonData)
 }
 
-func (serv ConversationService) PutMessage(posted, convoId string) {}
+func (serv ConversationService) SaveMessage(posted, convoId string) {
+	var data ReturnData.ReturnData
+	var str []string
+	str = strings.Split(posted, "=")
+	msg := Msg.Message{}
+	err := json.Unmarshal([]byte(str[1]), &msg)
+	if err != nil {
+		log.Println(err.Error())
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
+		return
+	} else {
+		json_msg, err := json.Marshal(msg)
+		if err != nil {
+			log.Println(err.Error())
+		} else {
+			data = Conversation.SaveMessage(convoId, string(json_msg))
+		}
+	}
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(201).Write(data.JsonData)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
+	}
 
-func (serv ConversationService) DeleteConvo(convoId string) {}
+}
+
+func (serv ConversationService) DeleteConversation(convoId string) {}
 
 func (serv ConversationService) DeleteMessage(convoId, msgId string) {}
 
@@ -169,7 +200,7 @@ func (serv MsgService) GetMessage() string {
 }
 
 func (serv MsgService) PostMessage(posted string) {
-	Mesiji.Save_Message(posted)
+	Msg.Save_Message(posted)
 }
 
 //*************User Service Methods ***************
