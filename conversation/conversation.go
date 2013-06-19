@@ -18,7 +18,7 @@ import (
 )
 
 type Conversation struct {
-	Id          bson.ObjectId        `json:"id"				bson:"_id"`
+	Id          bson.ObjectId        `json:"id"				bson:"id"`
 	Title       string               `json:"title" 			bson:"title"`
 	Messages    []Msg.Message        `json:"messages" 		bson:"messages"`
 	Venue       Location.GeoLocation `json:"venue" 			bson:"venue"`
@@ -39,6 +39,7 @@ func (conv *Conversation) CreateConversation() RD.ReturnData {
 		conv.Created_On = time.Now()
 		conv.Is_Approved = true
 	}
+
 	err := c.Insert(&conv)
 	if err != nil {
 		log.Print(err.Error())
@@ -77,6 +78,31 @@ func GetConversationForLocation(locationId string) RD.ReturnData {
 		returnData.JsonData = jsonRes
 	}
 	return returnData
+}
+
+func GetConversation(conversationId string) (returnData RD.ReturnData) {
+	dbSession := Connection.GetDBSession()
+	// dbSession.SetMode(mgo.Monotonic, true)
+	defer dbSession.Close()
+	log.Println(os.Getenv("MONGOHQ_URL"))
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
+	res := Conversation{}
+	// log.Println("Here I am:" + string(conversationId))
+	err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
+	if err != nil {
+		log.Println(err)
+		returnData.ErrorMsg = err
+		returnData.Status = "400"
+		returnData.Success = false
+	} else {
+		returnData.ErrorMsg = nil
+		returnData.Status = "200"
+		returnData.Success = true
+		jsonRes, _ := json.Marshal(res)
+		returnData.JsonData = jsonRes
+	}
+	return
 }
 
 func DeleteConversation(conversationId string) RD.ReturnData {

@@ -5,7 +5,6 @@ import (
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Location "github.com/jmadan/go-msgstory/geolocation"
 	Msg "github.com/jmadan/go-msgstory/message"
-	// Msg "go-msgstory/message"
 	"testing"
 )
 
@@ -59,13 +58,26 @@ func Test_GetConversationForLocation(t *testing.T) {
 	}
 }
 
-// func Test_DeleteConversation(t *testing.T) {
-// 	res := DeleteConversation("51bc529e2ffc2c5db5e9b215")
-// 	if res.Success {
-// 		t.Log("Test_DeleteConversation PASSED")
-// 	} else {
-// 		fmt.Println(res.ErrorMsg)
-// 		t.Fail()
-// 		t.Log("Test_DeleteConversation FAILED")
-// 	}
-// }
+func Test_DeleteConversation(t *testing.T) {
+	res := DeleteConversation("51bc529e2ffc2c5db5e9b215")
+	if res.Success {
+		t.Log("Test_DeleteConversation PASSED")
+	} else {
+		fmt.Println(res.ErrorMsg)
+		t.Fail()
+		t.Log("Test_DeleteConversation FAILED")
+	}
+}
+
+func Test_GetConversation(t *testing.T) {
+	conId := "51bc529e2ffc2c5db5e9b215"
+	res := GetConversation(conId)
+	if res.Success {
+		t.Log("Test_GetConversation PASSED")
+		fmt.Println(string(res.JsonData))
+	} else {
+		fmt.Println(res.ErrorMsg)
+		t.Fail()
+		t.Log("Test_GetConversation FAILED")
+	}
+}
