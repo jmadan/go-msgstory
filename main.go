@@ -81,24 +81,22 @@ func (serv ConversationService) CreateConversation(posted string) {
 	} else {
 		data = conv.CreateConversation()
 	}
-	jsonResponse, _ := json.Marshal(data)
 	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(201).Write(jsonResponse)
+		serv.ResponseBuilder().SetResponseCode(201).Write(data.JsonData)
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(jsonResponse)
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
 	}
 }
 
 func (serv ConversationService) GetConversations(locationId string) string {
 	var data ReturnData.ReturnData
 	data = Conversation.GetConversationForLocation(locationId)
-	jsonResponse, _ := json.Marshal(data)
 	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(200).Write(jsonResponse)
+		serv.ResponseBuilder().SetResponseCode(200)
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(jsonResponse)
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
 	}
-	return string(jsonResponse)
+	return string(data.JsonData)
 }
 
 func (serv ConversationService) GetConvo(convoId string) string {
