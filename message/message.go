@@ -9,8 +9,9 @@ import (
 )
 
 type Message struct {
-	MsgText string
-	OwnerID string
+	MsgText     string `json:"msg_text" bson:"msg_text"`
+	UserID      string `json:"user_id" bson:"user_id"`
+	ParentMsgId string `json:"parent_msg_id" bson:"parent_msg_id"`
 }
 
 func (M *Message) MsgToJSON() string {
