@@ -112,7 +112,7 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
-	err := c.Remove(bson.M{"_id": conversationId})
+	err := c.Remove(bson.ObjectIdHex(conversationId))
 	// err := c.Find(bson.M{"venue.fourid": locationId}).One(&res)
 	if err != nil {
 		log.Println("Found Nothing. Something went wrong fetching the Conversation document")
@@ -125,6 +125,38 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 		returnData.Status = "200"
 		returnData.Success = true
 		returnData.JsonData = nil
+	}
+	return returnData
+}
+
+func SaveMessage(ConversationId, json_msg string) RD.ReturnData {
+	returnData := RD.ReturnData{}
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
+
+	UpdateConversation := Conversation{}
+
+	var change = mgo.Change{
+		ReturnNew: true,
+		Update: bson.M{
+			"$set": bson.M{
+				"messages": json_msg,
+			}}}
+
+	_, err := c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
+
+	// err := c.Update(bson.ObjectIdHex(conversationId), {$set: {'messages.$': json_msg}})
+	if err != nil {
+		log.Println(err.Error())
+		returnData.ErrorMsg = err
+		returnData.Success = false
+		returnData.Status = "422"
+	} else {
+		returnData.Success = true
+		returnData.JsonData = []byte("Message Saved")
+		returnData.Status = "201"
 	}
 	return returnData
 }
