@@ -137,26 +137,32 @@ func SaveMessage(ConversationId, json_msg string) RD.ReturnData {
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	UpdateConversation := Conversation{}
-
-	var change = mgo.Change{
-		ReturnNew: true,
-		Update: bson.M{
-			"$set": bson.M{
-				"messages": json_msg,
-			}}}
-
-	_, err := c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
-
-	// err := c.Update(bson.ObjectIdHex(conversationId), {$set: {'messages.$': json_msg}})
+	json_Message := Msg.Message{}
+	err := json.Unmarshal([]byte(json_msg), &json_Message)
 	if err != nil {
 		log.Println(err.Error())
-		returnData.ErrorMsg = err
-		returnData.Success = false
-		returnData.Status = "422"
 	} else {
-		returnData.Success = true
-		returnData.JsonData = []byte("Message Saved")
-		returnData.Status = "201"
+		var change = mgo.Change{
+			ReturnNew: true,
+			Update: bson.M{
+				"$push": bson.M{"messages": bson.M{
+					"msg_text":      json_Message.MsgText,
+					"user_id":       json_Message.UserId,
+					"parent_msg_id": json_Message.ParentMsgId,
+				}}}}
+		_, err = c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
+		if err != nil {
+			log.Println(err.Error())
+			returnData.ErrorMsg = err
+			returnData.Success = false
+			returnData.Status = "422"
+		} else {
+			jsonData, _ := json.Marshal(&UpdateConversation)
+			returnData.Success = true
+			returnData.JsonData = jsonData
+			returnData.Status = "201"
+		}
 	}
+
 	return returnData
 }
