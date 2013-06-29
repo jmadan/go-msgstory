@@ -82,9 +82,9 @@ func (serv ConversationService) CreateConversation(posted string) {
 		data = conv.CreateConversation()
 	}
 	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(201).Write(data.JsonData)
+		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(data.ToString()))
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
 }
 
@@ -94,7 +94,7 @@ func (serv ConversationService) GetConversationsForLocation(locationId string) s
 	if data.Success {
 		serv.ResponseBuilder().SetResponseCode(200)
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
 	return string(data.JsonData)
 }
@@ -105,7 +105,7 @@ func (serv ConversationService) GetConversation(convoId string) string {
 	if data.Success {
 		serv.ResponseBuilder().SetResponseCode(200)
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
 	return string(data.JsonData)
 }
@@ -129,9 +129,9 @@ func (serv ConversationService) SaveMessage(posted, convoId string) {
 		}
 	}
 	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(201).Write(data.JsonData)
+		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(data.ToString()))
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(data.JsonData)
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
 
 }
