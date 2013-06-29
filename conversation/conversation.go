@@ -43,7 +43,7 @@ func (conv *Conversation) CreateConversation() RD.ReturnData {
 	err := c.Insert(&conv)
 	if err != nil {
 		log.Print(err.Error())
-		returnData.ErrorMsg = err
+		returnData.ErrorMsg = err.Error()
 		returnData.Success = false
 		returnData.Status = "422"
 	} else {
@@ -67,7 +67,7 @@ func GetConversationForLocation(locationId string) RD.ReturnData {
 	err := c.Find(bson.M{"venue.fourid": locationId}).One(&res)
 	if err != nil {
 		log.Println("Found Nothing. Something went wrong fetching the Conversation document")
-		returnData.ErrorMsg = err
+		returnData.ErrorMsg = err.Error()
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
@@ -92,7 +92,7 @@ func GetConversation(conversationId string) (returnData RD.ReturnData) {
 	err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
 	if err != nil {
 		log.Println(err)
-		returnData.ErrorMsg = err
+		returnData.ErrorMsg = err.Error()
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
@@ -117,7 +117,7 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 	if err != nil {
 		log.Println("Found Nothing. Something went wrong fetching the Conversation document")
 		log.Println(err)
-		returnData.ErrorMsg = err
+		returnData.ErrorMsg = err.Error()
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
@@ -153,7 +153,7 @@ func SaveMessage(ConversationId, json_msg string) RD.ReturnData {
 		_, err = c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
 		if err != nil {
 			log.Println(err.Error())
-			returnData.ErrorMsg = err
+			returnData.ErrorMsg = err.Error()
 			returnData.Success = false
 			returnData.Status = "422"
 		} else {

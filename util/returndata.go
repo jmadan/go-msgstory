@@ -6,7 +6,7 @@ import (
 
 type ReturnData struct {
 	Success  bool   `json:"success"`
-	ErrorMsg error  `json:"error_message"`
+	ErrorMsg string `json:"error_message"`
 	JsonData []byte `json:"json_data"`
 	Status   string `json:"status"`
 }
@@ -20,7 +20,7 @@ func (return_data *ReturnData) GetJsonData() string {
 }
 
 func (return_data *ReturnData) GetErrorMessage() string {
-	return return_data.ErrorMsg.Error()
+	return return_data.ErrorMsg
 }
 
 func (return_data *ReturnData) GetStatus() string {
@@ -28,11 +28,11 @@ func (return_data *ReturnData) GetStatus() string {
 }
 
 func (return_data *ReturnData) ToString() string {
-	str := "data={" +
-		"\"success\":" + return_data.GetSuccess() +
-		",\"error_msg\":" + return_data.GetErrorMessage() +
+	str := "{\"data\":{" +
+		"\"success\":\"" + return_data.GetSuccess() + "\"" +
+		",\"error_msg\":\"" + return_data.GetErrorMessage() + "\"" +
 		",\"json_data\":" + return_data.GetJsonData() +
-		",\"status\":" + return_data.GetStatus() +
-		"}"
+		",\"status\":\"" + return_data.GetStatus() + "\"" +
+		"}}"
 	return str
 }
