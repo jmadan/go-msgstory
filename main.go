@@ -96,7 +96,7 @@ func (serv ConversationService) GetConversationsForLocation(locationId string) s
 	} else {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
-	return string(data.JsonData)
+	return string(data.ToString())
 }
 
 func (serv ConversationService) GetConversation(convoId string) string {
@@ -107,7 +107,7 @@ func (serv ConversationService) GetConversation(convoId string) string {
 	} else {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
-	return string(data.JsonData)
+	return string(data.ToString())
 }
 
 func (serv ConversationService) SaveMessage(posted, convoId string) {
