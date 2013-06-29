@@ -71,7 +71,7 @@ func GetConversationForLocation(locationId string) RD.ReturnData {
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
-		returnData.ErrorMsg = nil
+		returnData.ErrorMsg = "All is well"
 		returnData.Status = "200"
 		returnData.Success = true
 		jsonRes, _ := json.Marshal(res)
@@ -96,7 +96,7 @@ func GetConversation(conversationId string) (returnData RD.ReturnData) {
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
-		returnData.ErrorMsg = nil
+		returnData.ErrorMsg = "All is well"
 		returnData.Status = "200"
 		returnData.Success = true
 		jsonRes, _ := json.Marshal(res)
@@ -121,7 +121,7 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
-		returnData.ErrorMsg = nil
+		returnData.ErrorMsg = "All is well"
 		returnData.Status = "200"
 		returnData.Success = true
 		returnData.JsonData = nil
