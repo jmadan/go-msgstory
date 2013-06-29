@@ -1,5 +1,9 @@
 package util
 
+import (
+	"strconv"
+)
+
 type ReturnData struct {
 	Success  bool   `json:"success"`
 	ErrorMsg error  `json:"error_message"`
@@ -7,18 +11,28 @@ type ReturnData struct {
 	Status   string `json:"status"`
 }
 
-func (return_data *ReturnData) GetSuccess() bool {
-	return return_data.Success
+func (return_data *ReturnData) GetSuccess() string {
+	return strconv.FormatBool(return_data.Success)
 }
 
-func (return_data *ReturnData) GetJsonData() []byte {
-	return return_data.JsonData
+func (return_data *ReturnData) GetJsonData() string {
+	return string(return_data.JsonData)
 }
 
-func (return_data *ReturnData) GetErrorMessage() error {
-	return return_data.ErrorMsg
+func (return_data *ReturnData) GetErrorMessage() string {
+	return return_data.ErrorMsg.Error()
 }
 
 func (return_data *ReturnData) GetStatus() string {
 	return return_data.Status
+}
+
+func (return_data *ReturnData) ToString() string {
+	str := "data={" +
+		"\"success\":" + return_data.GetSuccess() +
+		",\"error_msg\":" + return_data.GetErrorMessage() +
+		",\"json_data\":" + return_data.GetJsonData() +
+		",\"status\":" + return_data.GetStatus() +
+		"}"
+	return str
 }
