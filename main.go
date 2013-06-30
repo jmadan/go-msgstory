@@ -101,7 +101,7 @@ func (serv ConversationService) GetConversationsForLocation(locationId string) s
 
 func (serv ConversationService) GetConversation(convoId string) string {
 	var data ReturnData.ReturnData
-	data = Conversation.GetConversationForLocation(convoId)
+	data = Conversation.GetConversation(convoId)
 	if data.Success {
 		serv.ResponseBuilder().SetResponseCode(200)
 	} else {
