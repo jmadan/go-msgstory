@@ -62,9 +62,10 @@ type CircleService struct {
 }
 
 type LocationService struct {
-	gorest.RestService     `root:"/api/location/" consumes:"application/json" produces:"application/json"`
-	getLocations           gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
-	getLocationsWithLatLng gorest.EndPoint `method:"GET" path:"/coordinates/{lat:string}/{lng:string}" output:"string"`
+	gorest.RestService      `root:"/api/location/" consumes:"application/json" produces:"application/json"`
+	getLocations            gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
+	getLocationsWithLatLng  gorest.EndPoint `method:"GET" path:"/coordinates/{lat:string}/{lng:string}" output:"string"`
+	getLocationDetailWithId gorest.EndPoint `method:"GET" path:"/{venueId:string}" output:"string"`
 }
 
 //*************Conversation Service Methods ***********
@@ -150,6 +151,12 @@ func (serv LocationService) GetLocations(place string) string {
 
 func (serv LocationService) GetLocationsWithLatLng(lat, lng string) string {
 	str := Glocation.GetVenuesWithLatitudeAndLongitude(lat, lng)
+	serv.ResponseBuilder().SetResponseCode(200)
+	return str
+}
+
+func (serv LocationService) GetLocationDetailWithId(venueId string) string {
+	str := Glocation.GetVenueWithId(venueId)
 	serv.ResponseBuilder().SetResponseCode(200)
 	return str
 }
