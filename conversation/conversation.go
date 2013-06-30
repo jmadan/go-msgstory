@@ -76,7 +76,7 @@ func GetConversationsForLocation(locationId string) RD.ReturnData {
 		returnData.Success = true
 		jsonRes, _ := json.Marshal(res)
 		returnData.JsonData = jsonRes
-		log.Println(jsonRes)
+		log.Println(string(jsonRes))
 	}
 	return returnData
 }
