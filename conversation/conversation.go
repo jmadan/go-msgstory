@@ -63,14 +63,15 @@ func GetConversationsForLocation(locationId string) RD.ReturnData {
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
-	res := Conversation{}
-	err := c.Find(bson.M{"venue.fourid": locationId}).One(&res)
+	res := []Conversation{}
+	err := c.Find(bson.M{"venue.fourid": locationId}).All(&res)
 	if err != nil {
 		log.Println("Found Nothing Or Something went wrong fetching the Conversation document")
 		returnData.ErrorMsg = err.Error()
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
+		log.Println(res)
 		returnData.ErrorMsg = "All is well"
 		returnData.Status = "200"
 		returnData.Success = true
