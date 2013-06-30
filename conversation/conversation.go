@@ -56,7 +56,7 @@ func (conv *Conversation) CreateConversation() RD.ReturnData {
 	return returnData
 }
 
-func GetConversationForLocation(locationId string) RD.ReturnData {
+func GetConversationsForLocation(locationId string) RD.ReturnData {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
@@ -66,7 +66,7 @@ func GetConversationForLocation(locationId string) RD.ReturnData {
 	res := Conversation{}
 	err := c.Find(bson.M{"venue.fourid": locationId}).One(&res)
 	if err != nil {
-		log.Println("Found Nothing. Something went wrong fetching the Conversation document")
+		log.Println("Found Nothing Or Something went wrong fetching the Conversation document")
 		returnData.ErrorMsg = err.Error()
 		returnData.Status = "400"
 		returnData.Success = false
@@ -76,6 +76,7 @@ func GetConversationForLocation(locationId string) RD.ReturnData {
 		returnData.Success = true
 		jsonRes, _ := json.Marshal(res)
 		returnData.JsonData = jsonRes
+		log.Println(jsonRes)
 	}
 	return returnData
 }

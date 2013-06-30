@@ -1,7 +1,6 @@
 package conversation
 
 import (
-	"encoding/json"
 	"fmt"
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Location "github.com/jmadan/go-msgstory/geolocation"
@@ -11,18 +10,21 @@ import (
 
 var M1 = Msg.Message{
 	MsgText:     "Hola! how is everyone doing?",
-	UserID:      "SomeOwnerID",
+	UserId:      "SomeOwnerID",
 	ParentMsgId: "",
 }
 
 var M2 = Msg.Message{
 	MsgText:     "Hola! Not bad mate",
-	UserID:      "user id",
+	UserId:      "user id",
 	ParentMsgId: "",
 }
 
 var Cir = Circle.Circle{
 	Name: "Tapori",
+}
+var CirPub = Circle.Circle{
+	Name: "Public",
 }
 
 var Loc = Location.GeoLocation{
@@ -39,10 +41,10 @@ var Loc = Location.GeoLocation{
 	Country:  "United States",
 }
 var Conv = Conversation{
-	Title:     "This is a test conversation!",
+	Title:     "This is 2nd test conversation!",
 	Messages:  []Msg.Message{},
 	Venue:     Loc,
-	Circles:   []Circle.Circle{Cir},
+	Circles:   []Circle.Circle{Cir, CirPub},
 	ConvOwner: "001",
 }
 
@@ -56,7 +58,7 @@ func Test_CreateConversation(t *testing.T) {
 	}
 }
 
-func Test_GetConversationForLocation(t *testing.T) {
+func Test_GetConversationsForLocation(t *testing.T) {
 	res := GetConversationForLocation("4bce6383ef109521bd238486")
 	if res.Success {
 		t.Log("Test_GetConversationForLocation PASSED")

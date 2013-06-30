@@ -90,7 +90,7 @@ func (serv ConversationService) CreateConversation(posted string) {
 
 func (serv ConversationService) GetConversationsForLocation(locationId string) string {
 	var data ReturnData.ReturnData
-	data = Conversation.GetConversationForLocation(locationId)
+	data = Conversation.GetConversationsForLocation(locationId)
 	if data.Success {
 		serv.ResponseBuilder().SetResponseCode(200)
 	} else {
