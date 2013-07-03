@@ -11,17 +11,17 @@ import (
 )
 
 type GeoLocation struct {
-	FourID   string
-	Name     string
-	Contact  string
-	Address  string
-	Lat      int
-	Lng      int
-	Distance int
-	Postcode string
-	City     string
-	State    string
-	Country  string
+	FourID   string `json:"four_id"	bson:"four_id"`
+	Name     string `json:"name"	bson:"name"`
+	Contact  string `json:"contact"	bson:"contact"`
+	Address  string `json:"address"	bson:"address"`
+	Lat      int64  `json:"lat"	bson:"lat"`
+	Lng      int64  `json:"lng"	bson:"lng"`
+	Distance int    `json:"distance"	bson:"distance"`
+	Postcode string `json:"postcode"	bson:"postcode"`
+	City     string `json:"city"	bson:"city"`
+	State    string `json:"state"	bson:"state"`
+	Country  string `json:"country"	bson:"country"`
 }
 
 type Feed struct {
@@ -111,9 +111,6 @@ func GetVenuesWithLatitudeAndLongitude(lt, lg string) string {
 func GetVenueWithId(venueId string) string {
 	var FSqrUrl string
 	FSqrUrl = "https://api.foursquare.com/v2/venues/" + venueId + "&client_id=" + os.Getenv("FSQR_CLIENT_ID") + "&client_secret=" + os.Getenv("FSQR_CLIENT_SECRET")
-	// FSqrUrl = strings.Replace(FSqrUrl, "<lat>", lt, -1)
-	// FSqrUrl = strings.Replace(FSqrUrl, "<lng>", lg, -1)
-
 	return getLocations(FSqrUrl)
 }
 
