@@ -11,17 +11,17 @@ import (
 )
 
 type GeoLocation struct {
-	FourID   string `json:"four_id"	bson:"four_id"`
-	Name     string `json:"name"	bson:"name"`
-	Contact  string `json:"contact"	bson:"contact"`
-	Address  string `json:"address"	bson:"address"`
-	Lat      int64  `json:"lat"	bson:"lat"`
-	Lng      int64  `json:"lng"	bson:"lng"`
-	Distance int    `json:"distance"	bson:"distance"`
-	Postcode string `json:"postcode"	bson:"postcode"`
-	City     string `json:"city"	bson:"city"`
-	State    string `json:"state"	bson:"state"`
-	Country  string `json:"country"	bson:"country"`
+	FourID   string  `json:"four_id"	bson:"four_id"`
+	Name     string  `json:"name"	bson:"name"`
+	Contact  string  `json:"contact"	bson:"contact"`
+	Address  string  `json:"address"	bson:"address"`
+	Lat      float64 `json:"lat"	bson:"lat"`
+	Lng      float64 `json:"lng"	bson:"lng"`
+	Distance int     `json:"distance"	bson:"distance"`
+	Postcode string  `json:"postcode"	bson:"postcode"`
+	City     string  `json:"city"	bson:"city"`
+	State    string  `json:"state"	bson:"state"`
+	Country  string  `json:"country"	bson:"country"`
 }
 
 type Feed struct {
