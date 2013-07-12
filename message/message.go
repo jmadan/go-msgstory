@@ -2,13 +2,12 @@ package message
 
 import (
 	"encoding/json"
-	Connection "github.com/jmadan/go-msgstory/connection"
-	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log"
-	// "os"
 )
 
 type Message struct {
+	Id 			bson.ObjectId `json:"id" bson:"id"`
 	MsgText     string `json:"msg_text" bson:"msg_text"`
 	UserId      string `json:"user_id" bson:"user_id"`
 	ParentMsgId string `json:"parent_msg_id" bson:"parent_msg_id"`
@@ -27,30 +26,4 @@ func (M *Message) JsonToMsg(msgtext string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-}
-
-func Save_Message(msgtext string) bool {
-	var tempMsg Message
-	tempMsg.JsonToMsg(msgtext)
-
-	// err := json.Unmarshal([]byte(msgtext), &tempMsg)
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// }
-
-	// session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
-	session := Connection.GetDBSession()
-	// if err != nil {
-	// 	log.Fatal("Phat gayee : " + err.Error())
-	// }
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("msgme").C("message")
-
-	err := c.Insert(&tempMsg)
-	if err != nil {
-		log.Print(err.Error())
-		return false
-	}
-	return true
 }
