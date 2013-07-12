@@ -25,7 +25,7 @@ type AppService struct {
 }
 
 type UserService struct {
-	gorest.RestService `root:"/api/users/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/user/" consumes:"application/json" produces:"application/json"`
 
 	getUser      gorest.EndPoint `method:"GET" path:"/{userid:string}" output:"string"`
 	getAll       gorest.EndPoint `method:"GET" path:"/" output:"string"`
@@ -34,7 +34,7 @@ type UserService struct {
 }
 
 type ConversationService struct {
-	gorest.RestService `root:"/api/conversations/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/conversation/" consumes:"application/json" produces:"application/json"`
 
 	createConversation          gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
 	getConversationsForLocation gorest.EndPoint `method:"GET" path:"/all/{locationId:string}" output:"string"`
@@ -45,7 +45,7 @@ type ConversationService struct {
 }
 
 type MsgService struct {
-	gorest.RestService `root:"/api/messages/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/message/" consumes:"application/json" produces:"application/json"`
 	getMessage         gorest.EndPoint `method:"GET" path:"/" output:"string"`
 	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
 }
