@@ -16,6 +16,9 @@ func (return_data *ReturnData) GetSuccess() string {
 }
 
 func (return_data *ReturnData) GetJsonData() string {
+	if len(return_data.JsonData) == 0 {
+		return "{}"
+	}
 	return string(return_data.JsonData)
 }
 

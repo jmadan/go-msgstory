@@ -14,3 +14,9 @@ func Test_ToString(t *testing.T) {
 	testMsg := some_data.ToString()
 	fmt.Println(testMsg)
 }
+
+func Test_ToString_With_Empty_Data(t *testing.T) {
+	var some_data1 = ReturnData{true, "No Error", []byte(""), "200"}
+	testMsg := some_data1.ToString()
+	fmt.Println(testMsg)
+}
