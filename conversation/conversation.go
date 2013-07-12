@@ -18,7 +18,7 @@ import (
 )
 
 type Conversation struct {
-	Id          bson.ObjectId        `json:"id"				bson:"id"`
+	Id         bson.ObjectId        `json:"id"			bson:"id"`
 	Title       string               `json:"title" 			bson:"title"`
 	Messages    []Msg.Message        `json:"messages" 		bson:"messages"`
 	Venue       Location.GeoLocation `json:"venue" 			bson:"venue"`
@@ -90,8 +90,8 @@ func GetConversation(conversationId string) (returnData RD.ReturnData) {
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 	res := Conversation{}
-	// log.Println("Here I am:" + string(conversationId))
-	err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
+	// err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
+	err := c.Find(bson.M{"id": bson.ObjectIdHex(conversationId)}).One(&res)
 	if err != nil {
 		log.Println(err)
 		returnData.ErrorMsg = err.Error()
