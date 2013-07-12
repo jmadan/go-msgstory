@@ -39,7 +39,7 @@ type ConversationService struct {
 	createConversation          gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
 	getConversationsForLocation gorest.EndPoint `method:"GET" path:"/all/{locationId:string}" output:"string"`
 	getConversation             gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
-	saveMessage                 gorest.EndPoint `method:"POST" path:"/{convoId:string}/messages/" postdata:"string"`
+	saveMessage                 gorest.EndPoint `method:"POST" path:"/{convoId:string}/message/" postdata:"string"`
 	deleteConversation          gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
 	deleteMessage               gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
 }
@@ -122,12 +122,13 @@ func (serv ConversationService) SaveMessage(posted, convoId string) {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
 		return
 	} else {
-		json_msg, err := json.Marshal(msg)
-		if err != nil {
-			log.Println(err.Error())
-		} else {
-			data = Conversation.SaveMessage(convoId, string(json_msg))
-		}
+		data = Conversation.SaveMessage(convoId, &msg)
+		// json_msg, err := json.Marshal(msg)
+		// if err != nil {
+		// 	log.Println(err.Error())
+		// } else {
+		// 	data = Conversation.SaveMessage(convoId, string(json_msg))
+		// }
 	}
 	if data.Success {
 		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(data.ToString()))
@@ -207,7 +208,7 @@ func (serv MsgService) GetMessage() string {
 }
 
 func (serv MsgService) PostMessage(posted string) {
-	Msg.Save_Message(posted)
+	// Msg.Save_Message(posted)
 }
 
 //*************User Service Methods ***************
