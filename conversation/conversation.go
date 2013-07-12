@@ -131,7 +131,7 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 	return returnData
 }
 
-func SaveMessage(conversationId string, msg Msg.Message) RD.ReturnData {
+func SaveMessage(conversationId string, msg *Msg.Message) RD.ReturnData {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
