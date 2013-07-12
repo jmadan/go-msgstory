@@ -18,7 +18,7 @@ import (
 )
 
 type Conversation struct {
-	Id         bson.ObjectId        `json:"id"			bson:"id"`
+	Id         bson.ObjectId        `json:"id"				bson:"id"`
 	Title       string               `json:"title" 			bson:"title"`
 	Messages    []Msg.Message        `json:"messages" 		bson:"messages"`
 	Venue       Location.GeoLocation `json:"venue" 			bson:"venue"`
@@ -131,7 +131,7 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 	return returnData
 }
 
-func SaveMessage(ConversationId, json_msg string) RD.ReturnData {
+func SaveMessage(conversationId string, msg Msg.Message) RD.ReturnData {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
@@ -139,32 +139,52 @@ func SaveMessage(ConversationId, json_msg string) RD.ReturnData {
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	UpdateConversation := Conversation{}
-	json_Message := Msg.Message{}
-	err := json.Unmarshal([]byte(json_msg), &json_Message)
+	var change = mgo.Change{ ReturnNew: true, Update: bson.M{
+		"$push": bson.M{"messages": bson.M{
+			"id":			 msg.Id,
+			"msg_text":      msg.MsgText,
+			"user_id":       msg.UserId,
+			"parent_msg_id": msg.ParentMsgId,
+			}}}}
+	_, err := c.Find(bson.M{"id": bson.ObjectIdHex(conversationId)}).Apply(change, &UpdateConversation)
 	if err != nil {
 		log.Println(err.Error())
+		returnData.ErrorMsg = err.Error()
+		returnData.Success = false
+		returnData.Status = "422"
 	} else {
-		var change = mgo.Change{
-			ReturnNew: true,
-			Update: bson.M{
-				"$push": bson.M{"messages": bson.M{
-					"msg_text":      json_Message.MsgText,
-					"user_id":       json_Message.UserId,
-					"parent_msg_id": json_Message.ParentMsgId,
-				}}}}
-		_, err = c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
-		if err != nil {
-			log.Println(err.Error())
-			returnData.ErrorMsg = err.Error()
-			returnData.Success = false
-			returnData.Status = "422"
-		} else {
-			jsonData, _ := json.Marshal(&UpdateConversation)
-			returnData.Success = true
-			returnData.JsonData = jsonData
-			returnData.Status = "201"
-		}
+		jsonData, _ := json.Marshal(&UpdateConversation)
+		returnData.Success = true
+		returnData.JsonData = jsonData
+		returnData.Status = "201"
 	}
+
+	// json_Message := Msg.Message{}
+	// err := json.Unmarshal([]byte(json_msg), &json_Message)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// } else {
+	// 	var change = mgo.Change{
+	// 		ReturnNew: true,
+	// 		Update: bson.M{
+	// 			"$push": bson.M{"messages": bson.M{
+	// 				"msg_text":      json_Message.MsgText,
+	// 				"user_id":       json_Message.UserId,
+	// 				"parent_msg_id": json_Message.ParentMsgId,
+	// 			}}}}
+	// 	_, err = c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
+	// 	if err != nil {
+	// 		log.Println(err.Error())
+	// 		returnData.ErrorMsg = err.Error()
+	// 		returnData.Success = false
+	// 		returnData.Status = "422"
+	// 	} else {
+	// 		jsonData, _ := json.Marshal(&UpdateConversation)
+	// 		returnData.Success = true
+	// 		returnData.JsonData = jsonData
+	// 		returnData.Status = "201"
+	// 	}
+	// }
 
 	return returnData
 }
