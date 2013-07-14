@@ -39,15 +39,15 @@ type ConversationService struct {
 	createConversation          gorest.EndPoint `method:"POST" path:"/" postdata:"string"`
 	getConversationsForLocation gorest.EndPoint `method:"GET" path:"/all/{locationId:string}" output:"string"`
 	getConversation             gorest.EndPoint `method:"GET" path:"/{convoId:string}" output:"string"`
-	saveMessage                 gorest.EndPoint `method:"POST" path:"/{convoId:string}/message/" postdata:"string"`
 	deleteConversation          gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/"`
 	deleteMessage               gorest.EndPoint `method:"DELETE" path:"/{convoId:string}/messages/{msgId:string}"`
 }
 
 type MsgService struct {
 	gorest.RestService `root:"/api/message/" consumes:"application/json" produces:"application/json"`
-	getMessage         gorest.EndPoint `method:"GET" path:"/" output:"string"`
-	postMessage        gorest.EndPoint `method:"POST" path:"/postit/" postdata:"string"`
+
+	saveMessage gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
+	getMessages gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
 }
 
 type AuthenticateService struct {
@@ -109,33 +109,6 @@ func (serv ConversationService) GetConversation(convoId string) string {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
 	return string(data.ToString())
-}
-
-func (serv ConversationService) SaveMessage(posted, convoId string) {
-	var data ReturnData.ReturnData
-	var str []string
-	str = strings.Split(posted, "=")
-	msg := Msg.Message{}
-	err := json.Unmarshal([]byte(str[1]), &msg)
-	if err != nil {
-		log.Println(err.Error())
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
-		return
-	} else {
-		data = Conversation.SaveMessage(convoId, &msg)
-		// json_msg, err := json.Marshal(msg)
-		// if err != nil {
-		// 	log.Println(err.Error())
-		// } else {
-		// 	data = Conversation.SaveMessage(convoId, string(json_msg))
-		// }
-	}
-	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(data.ToString()))
-	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
-	}
-
 }
 
 func (serv ConversationService) DeleteConversation(convoId string) {}
@@ -202,13 +175,36 @@ func (serv AuthenticateService) LoginUser(posted string) {
 }
 
 //*************Message Service Methods ***************
-func (serv MsgService) GetMessage() string {
-	m := "{\"Message\": \"Welcome to Mesiji\"}"
-	return m
+func (serv MsgService) GetMessages(convoId string) string {
+	var data ReturnData.ReturnData
+	data = Msg.GetMessages(convoId)
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(200)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+	}
+	return string(data.ToString())
 }
 
-func (serv MsgService) PostMessage(posted string) {
-	// Msg.Save_Message(posted)
+func (serv MsgService) SaveMessage(posted, convoId string) {
+	var data ReturnData.ReturnData
+	var str []string
+	str = strings.Split(posted, "=")
+	msg := Msg.Message{}
+	err := json.Unmarshal([]byte(str[1]), &msg)
+	if err != nil {
+		log.Println(err.Error())
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
+		return
+	} else {
+		data = msg.SaveMessage(convoId)
+	}
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(data.ToString()))
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+	}
+
 }
 
 //*************User Service Methods ***************
