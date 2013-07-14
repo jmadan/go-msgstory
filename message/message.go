@@ -3,7 +3,6 @@ package message
 import (
 	"encoding/json"
 	Connection "github.com/jmadan/go-msgstory/connection"
-	Conversation "github.com/jmadan/go-msgstory/conversation"
 	RD "github.com/jmadan/go-msgstory/util"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -43,7 +42,6 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
-	UpdateConversation := Conversation.Conversation{}
 	var change = mgo.Change{ReturnNew: true, Update: bson.M{
 		"$push": bson.M{"messages": bson.M{
 			"id":            msg.Id,
@@ -52,14 +50,14 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 			"parent_msg_id": msg.ParentMsgId,
 			"created_on":    msg.CreatedOn,
 		}}}}
-	_, err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).Apply(change, &UpdateConversation)
+	err := c.Update(bson.M{"_id": bson.ObjectIdHex(conversationId)}, change)
 	if err != nil {
 		log.Println(err.Error())
 		returnData.ErrorMsg = err.Error()
 		returnData.Success = false
 		returnData.Status = "422"
 	} else {
-		jsonData, _ := json.Marshal(&UpdateConversation)
+		jsonData := []byte("{}")
 		returnData.Success = true
 		returnData.JsonData = jsonData
 		returnData.Status = "201"
@@ -67,22 +65,13 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 	return returnData
 }
 
-func (msg *Message) GetMessage(conversationId string) RD.ReturnData {
+func (msg *Message) GetMessages(conversationId string) RD.ReturnData {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
-	UpdateConversation := Conversation.Conversation{}
-	// var change = mgo.Change{ReturnNew: true, Update: bson.M{
-	// 	"$push": bson.M{"messages": bson.M{
-	// 		"id":            msg.Id,
-	// 		"msg_text":      msg.MsgText,
-	// 		"user_id":       msg.UserId,
-	// 		"parent_msg_id": msg.ParentMsgId,
-	// 		"created_on":    msg.CreatedOn,
-	// 	}}}}
 	Msgs := []Message{}
 	err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).All(&Msgs)
 	if err != nil {
@@ -91,7 +80,7 @@ func (msg *Message) GetMessage(conversationId string) RD.ReturnData {
 		returnData.Success = false
 		returnData.Status = "422"
 	} else {
-		jsonData, _ := json.Marshal(&UpdateConversation)
+		jsonData, _ := json.Marshal(&Msgs)
 		returnData.Success = true
 		returnData.JsonData = jsonData
 		returnData.Status = "201"
