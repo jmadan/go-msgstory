@@ -65,7 +65,7 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 	return returnData
 }
 
-func (msg *Message) GetMessages(conversationId string) RD.ReturnData {
+func GetMessages(conversationId string) RD.ReturnData {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
