@@ -16,9 +16,10 @@ import (
 )
 
 type User struct {
-	UserId int    `json:"userid" bson:"userid"`
-	Uid    int    `json:"uid" bson:"uid"`
-	Name   string `json:"name" bson:"name"`
+	Id     bson.ObjectId `json:"_id" bson:"_id"`
+	UserId int           `json:"userid" bson:"userid"`
+	Uid    int           `json:"uid" bson:"uid"`
+	Name   string        `json:"name" bson:"name"`
 	//	Age         int       `json:"age" bson:"age"`
 	Email       string    `json:"email" bson:"email"`
 	Handle      string    `json:"handle" bson:"handle"`

@@ -47,6 +47,7 @@ type MsgService struct {
 	gorest.RestService `root:"/api/message/" consumes:"application/json" produces:"application/json"`
 
 	saveMessage gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
+	getMessage  gorest.EndPoint `method:"GET" path:"/{msgId:string}" output:"string"`
 	getMessages gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
 }
 

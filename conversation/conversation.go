@@ -18,7 +18,7 @@ import (
 )
 
 type Conversation struct {
-	Id         bson.ObjectId        `json:"id"				bson:"id"`
+	Id          bson.ObjectId        `json:"_id"				bson:"_id"`
 	Title       string               `json:"title" 			bson:"title"`
 	Messages    []Msg.Message        `json:"messages" 		bson:"messages"`
 	Venue       Location.GeoLocation `json:"venue" 			bson:"venue"`
@@ -139,13 +139,13 @@ func SaveMessage(conversationId string, msg *Msg.Message) RD.ReturnData {
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	UpdateConversation := Conversation{}
-	var change = mgo.Change{ ReturnNew: true, Update: bson.M{
+	var change = mgo.Change{ReturnNew: true, Update: bson.M{
 		"$push": bson.M{"messages": bson.M{
-			"id":			 msg.Id,
+			"id":            msg.Id,
 			"msg_text":      msg.MsgText,
 			"user_id":       msg.UserId,
 			"parent_msg_id": msg.ParentMsgId,
-			}}}}
+		}}}}
 	_, err := c.Find(bson.M{"id": bson.ObjectIdHex(conversationId)}).Apply(change, &UpdateConversation)
 	if err != nil {
 		log.Println(err.Error())
