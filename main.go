@@ -187,6 +187,19 @@ func (serv MsgService) GetMessages(convoId string) string {
 	return string(data.ToString())
 }
 
+func (serv MsgService) GetMessage(msgId string) string {
+	var data ReturnData.ReturnData
+	data.Success = true
+	data.JsonData = []byte("Get Message call")
+	data.Status = "200"
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(200)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+	}
+	return string(data.ToString())
+}
+
 func (serv MsgService) SaveMessage(posted, convoId string) {
 	var data ReturnData.ReturnData
 	var str []string
@@ -276,7 +289,7 @@ func main() {
 	gorest.RegisterService(new(AppService))
 	gorest.RegisterService(new(UserService))
 	gorest.RegisterService(new(ConversationService))
-	// gorest.RegisterService(new(MsgService))
+	gorest.RegisterService(new(MsgService))
 	gorest.RegisterService(new(AuthenticateService))
 	gorest.RegisterService(new(CircleService))
 	gorest.RegisterService(new(LocationService))
