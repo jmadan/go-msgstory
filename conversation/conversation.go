@@ -15,17 +15,18 @@ import (
 	"os"
 	"strings"
 	"time"
+	"fmt"
 )
 
 type Conversation struct {
-	Id          bson.ObjectId        `json:"_id"				bson:"_id"`
-	Title       string               `json:"title" 			bson:"title"`
-	Messages    []Msg.Message        `json:"messages" 		bson:"messages"`
-	Venue       Location.GeoLocation `json:"venue" 			bson:"venue"`
-	Circles     []Group.Circle       `json:"circles" 		bson:"circles"`
-	ConvOwner   string               `json:"creator" 		bson:"creator"`
-	Is_Approved bool                 `json:"is_approved" 	bson:"is_approved"`
-	Created_On  time.Time            `json:"created_on" 	bson:"created_on, omitempty"`
+	Id          bson.ObjectId        `json:"_id" bson:"_id,omitempty"`
+	Title       string               `json:"title" bson:"title"`
+	Messages    []Msg.Message        `json:"messages" bson:"messages"`
+	Venue       Location.GeoLocation `json:"venue" bson:"venue"`
+	Circles     []Group.Circle       `json:"circles" bson:"circles"`
+	ConvOwner   string               `json:"creator" bson:"creator"`
+	Is_Approved bool                 `json:"is_approved" bson:"is_approved"`
+	Created_On  time.Time            `json:"created_on" bson:"created_on,omitempty"`
 }
 
 func (conv *Conversation) CreateConversation() RD.ReturnData {
@@ -34,12 +35,9 @@ func (conv *Conversation) CreateConversation() RD.ReturnData {
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
-	if conv.Id.Hex() == "" {
-		conv.Id = bson.NewObjectId()
-		conv.Created_On = time.Now()
-		conv.Is_Approved = true
-	}
-
+	conv.Created_On = time.Now()
+	conv.Is_Approved = true
+	
 	err := c.Insert(&conv)
 	if err != nil {
 		log.Print(err.Error())
@@ -83,6 +81,7 @@ func GetConversationsForLocation(locationId string) RD.ReturnData {
 }
 
 func GetConversation(conversationId string) (returnData RD.ReturnData) {
+	fmt.Println(conversationId)
 	dbSession := Connection.GetDBSession()
 	// dbSession.SetMode(mgo.Monotonic, true)
 	defer dbSession.Close()
@@ -91,13 +90,14 @@ func GetConversation(conversationId string) (returnData RD.ReturnData) {
 	c := dbSession.DB(dataBase[3]).C("conversation")
 	res := Conversation{}
 	// err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
-	err := c.Find(bson.M{"id": bson.ObjectIdHex(conversationId)}).One(&res)
+	err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).One(&res)
 	if err != nil {
 		log.Println(err)
 		returnData.ErrorMsg = err.Error()
 		returnData.Status = "400"
 		returnData.Success = false
 	} else {
+		log.Println(res)
 		returnData.ErrorMsg = "All is well"
 		returnData.Status = "200"
 		returnData.Success = true

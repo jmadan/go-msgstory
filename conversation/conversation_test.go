@@ -59,12 +59,13 @@ func Test_CreateConversation(t *testing.T) {
 }
 
 func Test_GetConversationsForLocation(t *testing.T) {
-	res := GetConversationForLocation("4bce6383ef109521bd238486")
+	res := GetConversationsForLocation("4bce6383ef109521bd238486")
+	// res := GetConversationsForLocation("4bce6383ef109521bd238486")
 	if res.Success {
-		t.Log("Test_GetConversationForLocation PASSED")
+		t.Log("Test_GetConversationsForLocation PASSED")
 	} else {
 		t.Fail()
-		t.Log("Test_GetConversationForLocation FAILED")
+		t.Log("Test_GetConversationsForLocation FAILED")
 	}
 }
 
@@ -80,7 +81,7 @@ func Test_DeleteConversation(t *testing.T) {
 }
 
 func Test_GetConversation(t *testing.T) {
-	conId := "51bc529e2ffc2c5db5e9b215"
+	conId := "51ec3bee5fb5e52f2860a04c"
 	res := GetConversation(conId)
 	if res.Success {
 		t.Log("Test_GetConversation PASSED")
@@ -92,22 +93,22 @@ func Test_GetConversation(t *testing.T) {
 	}
 }
 
-func Test_SaveMessage(t *testing.T) {
-	conId := "51bc529e2ffc2c5db5e9b215"
-	json_msg, err := json.Marshal(M2)
-	if err != nil {
-		fmt.Println(err.Error())
-		t.Fail()
-		t.Log("Test_SaveMessage FAILED")
-	}
+// func Test_SaveMessage(t *testing.T) {
+// 	conId := "51bc529e2ffc2c5db5e9b215"
+// 	json_msg, err := json.Marshal(M2)
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 		t.Fail()
+// 		t.Log("Test_SaveMessage FAILED")
+// 	}
 
-	res := SaveMessage(conId, string(json_msg))
-	if res.Success {
-		t.Log("Test_SaveMessage PASSED")
-		fmt.Println(string(res.JsonData))
-	} else {
-		fmt.Println(res.ErrorMsg)
-		t.Fail()
-		t.Log("Test_SaveMessage FAILED")
-	}
-}
+// 	res := SaveMessage(conId, string(json_msg))
+// 	if res.Success {
+// 		t.Log("Test_SaveMessage PASSED")
+// 		fmt.Println(string(res.JsonData))
+// 	} else {
+// 		fmt.Println(res.ErrorMsg)
+// 		t.Fail()
+// 		t.Log("Test_SaveMessage FAILED")
+// 	}
+// }
