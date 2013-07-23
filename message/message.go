@@ -13,7 +13,7 @@ import (
 )
 
 type Message struct {
-	Id          bson.ObjectId `json:"_id" bson:"_id"`
+	Id          bson.ObjectId `json:"_id" bson:"_id,omitempty"`
 	MsgText     string        `json:"msg_text" bson:"msg_text"`
 	UserId      string        `json:"user_id" bson:"user_id"`
 	ParentMsgId string        `json:"parent_msg_id" bson:"parent_msg_id"`
@@ -25,6 +25,7 @@ func (M *Message) MsgToJSON() string {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
 	return string(mjson)
 }
 
@@ -44,7 +45,6 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 
 	var change = mgo.Change{ReturnNew: true, Update: bson.M{
 		"$push": bson.M{"messages": bson.M{
-			"id":            msg.Id,
 			"msg_text":      msg.MsgText,
 			"user_id":       msg.UserId,
 			"parent_msg_id": msg.ParentMsgId,
