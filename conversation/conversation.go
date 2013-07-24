@@ -29,12 +29,29 @@ type Conversation struct {
 	Created_On  time.Time            `json:"created_on" bson:"created_on,omitempty"`
 }
 
-func (conv *Conversation) CreateConversation() RD.ReturnData {
+func (C *Conversation) ConversationToJSON() string {
+	cjson, err := json.Marshal(C)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return string(cjson)
+}
+
+func (C *Conversation) JsonToConversation(conv string) {
+	err := json.Unmarshal([]byte(conv), &C)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+}
+
+func (conv *Conversation) CreateConversation() (RD.ReturnData, Conversation) {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
+	conv.Id = bson.NewObjectId()
 	conv.Created_On = time.Now()
 	conv.Is_Approved = true
 
@@ -45,13 +62,14 @@ func (conv *Conversation) CreateConversation() RD.ReturnData {
 		returnData.Success = false
 		returnData.Status = "422"
 	} else {
+
 		returnData.Success = true
 		jsonData, _ := json.Marshal(&conv)
 		returnData.JsonData = jsonData
 		returnData.Status = "201"
 	}
 
-	return returnData
+	return returnData, *conv
 }
 
 func GetConversationsForLocation(locationId string) RD.ReturnData {
