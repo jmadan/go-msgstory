@@ -90,7 +90,7 @@ func (serv ConversationService) CreateConversation(posted string) {
 	}
 	if cdata.Success {
 		msg.JsonToMsg(messageData[1])
-		mdata = msg.SaveMessage(savedConversation.Id.String())
+		mdata = msg.SaveMessage(savedConversation.Id.Hex())
 	} else {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(cdata.ToString()))
 	}
