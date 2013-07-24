@@ -13,11 +13,10 @@ import (
 )
 
 type Message struct {
-	Id          bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	MsgText     string        `json:"msg_text" bson:"msg_text"`
-	UserId      string        `json:"user_id" bson:"user_id"`
-	ParentMsgId string        `json:"parent_msg_id" bson:"parent_msg_id"`
-	CreatedOn   time.Time     `json:"created_on" 	bson:"created_on, omitempty"`
+	Id        bson.ObjectId `json:"_id" bson:"_id,omitempty"`
+	MsgText   string        `json:"msg_text" bson:"msg_text"`
+	UserId    string        `json:"user_id" bson:"user_id"`
+	CreatedOn time.Time     `json:"created_on" 	bson:"created_on, omitempty"`
 }
 
 func (M *Message) MsgToJSON() string {
@@ -42,15 +41,16 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
+	msg.CreatedOn = time.Now()
 
-	var change = mgo.Change{ReturnNew: true, Update: bson.M{
+	err := c.Update(bson.M{"_id": bson.ObjectIdHex(conversationId)}, bson.M{
 		"$push": bson.M{"messages": bson.M{
-			"msg_text":      msg.MsgText,
-			"user_id":       msg.UserId,
-			"parent_msg_id": msg.ParentMsgId,
-			"created_on":    msg.CreatedOn,
-		}}}}
-	err := c.Update(bson.M{"_id": bson.ObjectIdHex(conversationId)}, change)
+			"Id":         bson.NewObjectId(),
+			"msg_text":   msg.MsgText,
+			"user_id":    msg.UserId,
+			"created_on": msg.CreatedOn,
+		}}})
+
 	if err != nil {
 		log.Println(err.Error())
 		returnData.ErrorMsg = err.Error()
@@ -80,6 +80,7 @@ func GetMessages(conversationId string) RD.ReturnData {
 		returnData.Success = false
 		returnData.Status = "422"
 	} else {
+		log.Println(Msgs)
 		jsonData, _ := json.Marshal(&Msgs)
 		returnData.Success = true
 		returnData.JsonData = jsonData
