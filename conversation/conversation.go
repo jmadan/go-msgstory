@@ -8,6 +8,7 @@ import (
 	Location "github.com/jmadan/go-msgstory/geolocation"
 	Msg "github.com/jmadan/go-msgstory/message"
 	// User "github.com/jmadan/go-msgstory/user"
+	"fmt"
 	RD "github.com/jmadan/go-msgstory/util"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -15,7 +16,6 @@ import (
 	"os"
 	"strings"
 	"time"
-	"fmt"
 )
 
 type Conversation struct {
@@ -37,7 +37,7 @@ func (conv *Conversation) CreateConversation() RD.ReturnData {
 	c := dbSession.DB(dataBase[3]).C("conversation")
 	conv.Created_On = time.Now()
 	conv.Is_Approved = true
-	
+
 	err := c.Insert(&conv)
 	if err != nil {
 		log.Print(err.Error())
@@ -131,60 +131,28 @@ func DeleteConversation(conversationId string) RD.ReturnData {
 	return returnData
 }
 
-func SaveMessage(conversationId string, msg *Msg.Message) RD.ReturnData {
+func GetAllConversations() RD.ReturnData {
 	returnData := RD.ReturnData{}
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
-	UpdateConversation := Conversation{}
-	var change = mgo.Change{ReturnNew: true, Update: bson.M{
-		"$push": bson.M{"messages": bson.M{
-			"id":            msg.Id,
-			"msg_text":      msg.MsgText,
-			"user_id":       msg.UserId,
-			"parent_msg_id": msg.ParentMsgId,
-		}}}}
-	_, err := c.Find(bson.M{"id": bson.ObjectIdHex(conversationId)}).Apply(change, &UpdateConversation)
+	res := []Conversation{}
+	err := c.Find(bson.M{}).All(&res)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Found Nothing Or Something went wrong fetching the Conversation document")
 		returnData.ErrorMsg = err.Error()
+		returnData.Status = "400"
 		returnData.Success = false
-		returnData.Status = "422"
 	} else {
-		jsonData, _ := json.Marshal(&UpdateConversation)
+		log.Println(res)
+		returnData.ErrorMsg = "All is well"
+		returnData.Status = "200"
 		returnData.Success = true
-		returnData.JsonData = jsonData
-		returnData.Status = "201"
+		jsonRes, _ := json.Marshal(res)
+		returnData.JsonData = jsonRes
+		log.Println(string(jsonRes))
 	}
-
-	// json_Message := Msg.Message{}
-	// err := json.Unmarshal([]byte(json_msg), &json_Message)
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// } else {
-	// 	var change = mgo.Change{
-	// 		ReturnNew: true,
-	// 		Update: bson.M{
-	// 			"$push": bson.M{"messages": bson.M{
-	// 				"msg_text":      json_Message.MsgText,
-	// 				"user_id":       json_Message.UserId,
-	// 				"parent_msg_id": json_Message.ParentMsgId,
-	// 			}}}}
-	// 	_, err = c.FindId(bson.ObjectIdHex(ConversationId)).Apply(change, &UpdateConversation)
-	// 	if err != nil {
-	// 		log.Println(err.Error())
-	// 		returnData.ErrorMsg = err.Error()
-	// 		returnData.Success = false
-	// 		returnData.Status = "422"
-	// 	} else {
-	// 		jsonData, _ := json.Marshal(&UpdateConversation)
-	// 		returnData.Success = true
-	// 		returnData.JsonData = jsonData
-	// 		returnData.Status = "201"
-	// 	}
-	// }
-
 	return returnData
 }

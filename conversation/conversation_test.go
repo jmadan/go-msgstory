@@ -8,17 +8,17 @@ import (
 	"testing"
 )
 
-var M1 = Msg.Message{
-	MsgText:     "Hola! how is everyone doing?",
-	UserId:      "SomeOwnerID",
-	ParentMsgId: "",
-}
+// var M1 = Msg.Message{
+// 	MsgText:     "Hola! how is everyone doing?",
+// 	UserId:      "SomeOwnerID",
+// 	ParentMsgId: "",
+// }
 
-var M2 = Msg.Message{
-	MsgText:     "Hola! Not bad mate",
-	UserId:      "user id",
-	ParentMsgId: "",
-}
+// var M2 = Msg.Message{
+// 	MsgText:     "Hola! Not bad mate",
+// 	UserId:      "user id",
+// 	ParentMsgId: "",
+// }
 
 var Cir = Circle.Circle{
 	Name: "Tapori",
@@ -51,10 +51,23 @@ var Conv = Conversation{
 func Test_CreateConversation(t *testing.T) {
 	res := Conv.CreateConversation()
 	if res.Success {
+		fmt.Println(string(res.JsonData))
 		t.Log("Test_CreateConversation PASSED")
 	} else {
 		t.Fail()
 		t.Log("Test_CreateConversation FAILED")
+	}
+}
+
+func Test_GetAllConversations(t *testing.T) {
+	res := GetAllConversations()
+	// res := GetConversationsForLocation("4bce6383ef109521bd238486")
+	if res.Success {
+		fmt.Print("success")
+		t.Log("Test_GetConversationsForLocation PASSED")
+	} else {
+		t.Fail()
+		t.Log("Test_GetConversationsForLocation FAILED")
 	}
 }
 
@@ -93,22 +106,22 @@ func Test_GetConversation(t *testing.T) {
 	}
 }
 
-// func Test_SaveMessage(t *testing.T) {
-// 	conId := "51bc529e2ffc2c5db5e9b215"
-// 	json_msg, err := json.Marshal(M2)
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 		t.Fail()
-// 		t.Log("Test_SaveMessage FAILED")
-// 	}
+func Test_SaveMessage(t *testing.T) {
+	conId := "51bc529e2ffc2c5db5e9b215"
+	json_msg, err := json.Marshal(M2)
+	if err != nil {
+		fmt.Println(err.Error())
+		t.Fail()
+		t.Log("Test_SaveMessage FAILED")
+	}
 
-// 	res := SaveMessage(conId, string(json_msg))
-// 	if res.Success {
-// 		t.Log("Test_SaveMessage PASSED")
-// 		fmt.Println(string(res.JsonData))
-// 	} else {
-// 		fmt.Println(res.ErrorMsg)
-// 		t.Fail()
-// 		t.Log("Test_SaveMessage FAILED")
-// 	}
-// }
+	res := SaveMessage(conId, string(json_msg))
+	if res.Success {
+		t.Log("Test_SaveMessage PASSED")
+		fmt.Println(string(res.JsonData))
+	} else {
+		fmt.Println(res.ErrorMsg)
+		t.Fail()
+		t.Log("Test_SaveMessage FAILED")
+	}
+}
