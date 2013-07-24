@@ -71,23 +71,36 @@ type LocationService struct {
 
 //*************Conversation Service Methods ***********
 func (serv ConversationService) CreateConversation(posted string) {
-	var data ReturnData.ReturnData
-	var str []string
-	str = strings.Split(posted, "=")
+	var cdata, mdata ReturnData.ReturnData
+	var formData []string
+	formData = strings.Split(posted, "&")
+	conversationData := strings.Split(formData[0], "=")
+	messageData := strings.Split(formData[1], "=")
+
 	conv := Conversation.Conversation{}
-	err := json.Unmarshal([]byte(str[1]), &conv)
+	savedConversation := Conversation.Conversation{}
+	msg := Msg.Message{}
+	err := json.Unmarshal([]byte(conversationData[1]), &conv)
 	if err != nil {
 		log.Println(err.Error())
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride(nil)
 		return
 	} else {
-		data = conv.CreateConversation()
+		cdata, savedConversation = conv.CreateConversation()
 	}
-	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(data.ToString()))
+	if cdata.Success {
+		msg.JsonToMsg(messageData[1])
+		mdata = msg.SaveMessage(savedConversation.Id.String())
 	} else {
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(cdata.ToString()))
 	}
+
+	if cdata.Success && mdata.Success {
+		serv.ResponseBuilder().SetResponseCode(201).Write([]byte(cdata.ToString()))
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(cdata.ToString()))
+	}
+
 }
 
 func (serv ConversationService) GetConversationsForLocation(locationId string) string {
