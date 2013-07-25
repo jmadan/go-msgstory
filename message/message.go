@@ -16,7 +16,11 @@ type Message struct {
 	Id        bson.ObjectId `json:"_id" bson:"_id,omitempty"`
 	MsgText   string        `json:"msg_text" bson:"msg_text"`
 	UserId    string        `json:"user_id" bson:"user_id"`
-	CreatedOn time.Time     `json:"created_on" 	bson:"created_on, omitempty"`
+	CreatedOn time.Time     `json:"created_on" bson:"created_on"`
+}
+
+type Messages struct {
+	Messages []Message `json:"messages" bson:"messages"`
 }
 
 func (M *Message) MsgToJSON() string {
@@ -45,7 +49,7 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 
 	err := c.Update(bson.M{"_id": bson.ObjectIdHex(conversationId)}, bson.M{
 		"$push": bson.M{"messages": bson.M{
-			"Id":         bson.NewObjectId(),
+			"_id":        bson.NewObjectId(),
 			"msg_text":   msg.MsgText,
 			"user_id":    msg.UserId,
 			"created_on": msg.CreatedOn,
@@ -73,7 +77,8 @@ func GetMessages(conversationId string) RD.ReturnData {
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
 	Msgs := []Message{}
-	err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).All(&Msgs)
+	m := Messages{}
+	err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).Select(bson.M{"messages": 1}).One(&m)
 	if err != nil {
 		log.Println(err.Error())
 		returnData.ErrorMsg = err.Error()
@@ -81,7 +86,7 @@ func GetMessages(conversationId string) RD.ReturnData {
 		returnData.Status = "422"
 	} else {
 		log.Println(Msgs)
-		jsonData, _ := json.Marshal(&Msgs)
+		jsonData, _ := json.Marshal(&m)
 		returnData.Success = true
 		returnData.JsonData = jsonData
 		returnData.Status = "201"
