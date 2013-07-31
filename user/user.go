@@ -16,40 +16,38 @@ import (
 )
 
 type User struct {
-	Id     bson.ObjectId `json:"_id" bson:"_id"`
-	UserId int           `json:"userid" bson:"userid"`
-	Uid    int           `json:"uid" bson:"uid"`
-	Name   string        `json:"name" bson:"name"`
-	//	Age         int       `json:"age" bson:"age"`
-	Email       string    `json:"email" bson:"email"`
-	Handle      string    `json:"handle" bson:"handle"`
-	PhoneNumber string    `json:"phone" bson:"phone"`
-	Relations   rels      `json:"relations" bson:"relations"`
-	Created_on  time.Time `json:"created_on" bson:"created_on"`
+	Id          bson.ObjectId `json:"_id" bson:"_id"`
+	UserId      int           `json:"userid" bson:"userid"`
+	Name        string        `json:"name" bson:"name"`
+	Email       string        `json:"email" bson:"email"`
+	Handle      string        `json:"handle" bson:"handle"`
+	PhoneNumber string        `json:"phone" bson:"phone"`
+	Relations   rels          `json:"relations" bson:"relations"`
+	Created_on  time.Time     `json:"created_on" bson:"created_on"`
 }
 
 type rels struct {
 	Messages []Message.Message `json:"messages" bson:"messages"`
 }
 
-type JSONUser struct {
-	UserId int    `json:"userid" bson:"userid"`
-	Uid    int    `json:"uid" bson:"uid"`
-	Name   string `json:"name" bson:"name"`
-	// Age         int    `json:"age" bson:"age"`
-	Email       string    `json:"email" bson:"email"`
-	Handle      string    `json:"handle" bson:"handle"`
-	PhoneNumber string    `json:"phone" bson:"phone"`
-	Relations   rels      `json:"relations" bson:"relations"`
-	Created_on  time.Time `json:"created_on" bson:"created_on"`
-}
+// type JSONUser struct {
+// 	UserId int    `json:"userid" bson:"userid"`
+// 	Uid    int    `json:"uid" bson:"uid"`
+// 	Name   string `json:"name" bson:"name"`
+// 	// Age         int    `json:"age" bson:"age"`
+// 	Email       string    `json:"email" bson:"email"`
+// 	Handle      string    `json:"handle" bson:"handle"`
+// 	PhoneNumber string    `json:"phone" bson:"phone"`
+// 	Relations   rels      `json:"relations" bson:"relations"`
+// 	Created_on  time.Time `json:"created_on" bson:"created_on"`
+// }
 
 func (u *User) SetEmail(email string) {
 	u.Email = email
 }
 
-func (u *User) SetUid(id int) {
-	u.Uid = id
+func (u *User) SetUserid(id int) {
+	u.UserId = id
 }
 
 func (u *User) GetName() string {
@@ -79,15 +77,12 @@ func (u *User) GetUser() string {
 	c := dbSession.DB(dataBase[3]).C("jove")
 
 	result := User{}
-	err := c.Find(bson.M{"email": u.Email, "uid": u.Uid}).One(&result)
+	err := c.Find(bson.M{"email": u.Email, "user_id": u.UserId}).One(&result)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	js, _ := json.Marshal(result)
-	// fmt.Printf("%s", js)
 	return string(js)
-	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-	// return
 }
 
 func GetAll() string {
@@ -105,20 +100,6 @@ func GetAll() string {
 	return "hello"
 }
 
-func (u *User) MarshalJSON() ([]byte, error) {
-	jsonUser := JSONUser{
-		u.UserId,
-		u.Uid,
-		u.Name,
-		u.Email,
-		u.Handle,
-		u.PhoneNumber,
-		u.Relations,
-		u.Created_on,
-	}
-	return json.Marshal(jsonUser)
-}
-
 func GetByEmailAndUserId(email string, user_id int) (User, error) {
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
@@ -130,8 +111,6 @@ func GetByEmailAndUserId(email string, user_id int) (User, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
 	return result, err
 }
 
@@ -148,8 +127,6 @@ func (u *User) GetByHandle() User {
 	}
 
 	return result
-	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-	// return
 }
 
 func (u *User) CreateUser() bool {

@@ -2,15 +2,16 @@ package user
 
 import (
 	"encoding/json"
+	"labix.org/v2/mgo/bson"
 	"testing"
 	"time"
 )
 
 func Test_CreatePerson(t *testing.T) {
-	person := User{0, 1, "Jasdeep", "jasdeepm@gmail.com", "JD", "07818912893", rels{}, time.Now()}
-	res := person.CreateUser()
+	user := User{bson.NewObjectId(), 12, "Jasdeep", "jasdeepm@gmail.com", "JD", "07818912893", rels{}, time.Now()}
+	res := user.CreateUser()
 	if res {
-		t.Log("Test_CreatePerson PASSED")
+		t.Log("Test_CreateUser PASSED")
 	} else {
 		t.Fail()
 	}
@@ -29,7 +30,7 @@ func Test_GetUser(t *testing.T) {
 	// person := User{0, 1, "Jasdeep", "jasdeepm@gmail.com", "JD", "07818912893", rels{}, time.Now()}
 	temp_person := User{}
 	tUser := User{}
-	temp_person.SetUid(1)
+	// temp_person.SetUserid(1)
 	temp_person.SetEmail("jasdeepm@gmail.com")
 	str := temp_person.GetUser()
 	err := json.Unmarshal([]byte(str), &tUser)
