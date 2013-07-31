@@ -53,17 +53,20 @@ type MsgService struct {
 
 type AuthenticateService struct {
 	gorest.RestService `root:"/api/auth/" consumes:"application/json" produces:"application/json"`
-	loginUser          gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
+
+	loginUser gorest.EndPoint `method:"POST" path:"/login/" postdata:"string"`
 }
 
 type CircleService struct {
 	gorest.RestService `root:"/api/circle/" consumes:"application/json" produces:"application/json"`
-	createCircle       gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
-	getCircles         gorest.EndPoint `method:"GET" path:"/circles/" output:"string"`
+
+	createCircle gorest.EndPoint `method:"POST" path:"/new/" postdata:"string"`
+	getCircles   gorest.EndPoint `method:"GET" path:"/circles/" output:"string"`
 }
 
 type LocationService struct {
-	gorest.RestService      `root:"/api/location/" consumes:"application/json" produces:"application/json"`
+	gorest.RestService `root:"/api/location/" consumes:"application/json" produces:"application/json"`
+
 	getLocations            gorest.EndPoint `method:"GET" path:"/near/{place:string}" output:"string"`
 	getLocationsWithLatLng  gorest.EndPoint `method:"GET" path:"/coordinates/{lat:string}/{lng:string}" output:"string"`
 	getLocationDetailWithId gorest.EndPoint `method:"GET" path:"/{venueId:string}" output:"string"`
@@ -182,7 +185,7 @@ func (serv AuthenticateService) LoginUser(posted string) {
 	} else {
 		auth.Authorize()
 		user.SetEmail(auth.Email)
-		user.SetUid(auth.User_id)
+		user.SetUserid(auth.User_id)
 		serv.ResponseBuilder().SetResponseCode(200).Write([]byte(user.GetUser()))
 		return
 	}
