@@ -77,7 +77,7 @@ func (u *User) GetUser() string {
 	c := dbSession.DB(dataBase[3]).C("jove")
 
 	result := User{}
-	err := c.Find(bson.M{"email": u.Email, "user_id": u.UserId}).One(&result)
+	err := c.Find(bson.M{"email": u.Email, "userid": u.UserId}).One(&result)
 	if err != nil {
 		log.Println(err.Error())
 	}
