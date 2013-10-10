@@ -21,7 +21,8 @@ import (
 
 type AppService struct {
 	gorest.RestService `root:"/api/" consumes:"application/json" produces:"application/json"`
-	getApp             gorest.EndPoint `method:"GET" path:"/" output:"string"`
+
+	getApp gorest.EndPoint `method:"GET" path:"/" output:"string"`
 }
 
 type UserService struct {
@@ -268,10 +269,17 @@ func (serv UserService) CreateUser(uemail, pass string) string {
 }
 
 func (serv UserService) GetUser(userid string) string {
+	var data ReturnData.ReturnData
+	data = User.GetUserById(userid)
+	if data.Success {
+		serv.ResponseBuilder().SetResponseCode(200)
+	} else {
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+	}
+	return string(data.ToString())
 	// user := User.User{}
 	// per := "{User:[" + User.User.GetUser() + "]}"
 	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
-	return "Some User"
 }
 
 func (serv UserService) GetAll() string {
