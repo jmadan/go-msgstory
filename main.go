@@ -305,11 +305,17 @@ func (serv UserService) GetUserMessages(userid string) string {
 	if msgErr != nil {
 		data.ErrorMsg = msgErr.Error()
 	} else {
-		userErr := json.Unmarshal([]byte(User.GetUserById(userid)), &user)
-		if userErr != nil {
-			data.ErrorMsg = userErr.Error()
+		response, err := User.GetUserById(userid)
+		// userErr := json.Unmarshal([]byte(User.GetUserById(userid)), &user)
+		if err != nil {
+			data.ErrorMsg = err.Error()
 		} else {
-			data.ErrorMsg = "All is Well"
+			err = json.Unmarshal([]byte(response), &user)
+			if err != nil {
+				data.ErrorMsg = err.Error()
+			} else {
+				data.ErrorMsg = "All is Well"
+			}
 		}
 	}
 
