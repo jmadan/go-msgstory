@@ -3,7 +3,7 @@ package message
 import (
 	"encoding/json"
 	Connection "github.com/jmadan/go-msgstory/connection"
-	User "github.com/jmadan/go-msgstory/user"
+	// User "github.com/jmadan/go-msgstory/user"
 	RD "github.com/jmadan/go-msgstory/util"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -18,7 +18,7 @@ type Message struct {
 	MsgText   string        `json:"msg_text" bson:"msg_text"`
 	UserId    string        `json:"user_id" bson:"user_id"`
 	CreatedOn time.Time     `json:"created_on" bson:"created_on"`
-	User      User.User     `json:"user" bson:"user"`
+	// User      User.User     `json:"user" bson:"user"`
 }
 
 type Messages struct {
