@@ -19,6 +19,11 @@ import (
 	"strings"
 )
 
+type CompositeMsg struct {
+	Message  Msg.Message `json:"message" bson:"message"`
+	PostedBy User.User   `json:"postedby" bson:"postedby"`
+}
+
 type AppService struct {
 	gorest.RestService `root:"/api/" consumes:"application/json" produces:"application/json"`
 
@@ -47,9 +52,10 @@ type ConversationService struct {
 type MsgService struct {
 	gorest.RestService `root:"/api/message/" consumes:"application/json" produces:"application/json"`
 
-	saveMessage gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
-	getMessage  gorest.EndPoint `method:"GET" path:"/{msgId:string}" output:"string"`
-	getMessages gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
+	saveMessage     gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
+	getMessage      gorest.EndPoint `method:"GET" path:"/{msgId:string}" output:"string"`
+	getMessages     gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
+	getUserMessages gorest.EndPoint `method:"GET" path:"/messages/user/{userid:string}" output:"string"`
 }
 
 type AuthenticateService struct {
@@ -269,17 +275,60 @@ func (serv UserService) CreateUser(uemail, pass string) string {
 }
 
 func (serv UserService) GetUser(userid string) string {
+	var response string
+	var err error
 	var data ReturnData.ReturnData
-	data = User.GetUserById(userid)
-	if data.Success {
+	response, err = User.GetUserById(userid)
+	if err != nil {
+		data.Status = "400"
+		data.Success = false
+		data.ErrorMsg = err.Error()
 		serv.ResponseBuilder().SetResponseCode(200)
 	} else {
+		data.ErrorMsg = "All is well"
+		data.Status = "200"
+		data.Success = true
+		data.JsonData = []byte(response)
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
+
 	return string(data.ToString())
-	// user := User.User{}
-	// per := "{User:[" + User.User.GetUser() + "]}"
-	// serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+}
+
+func (serv UserService) GetUserMessages(userid string) string {
+	var data ReturnData.ReturnData
+	var resData CompositeMsg
+	var message Msg.Message
+	var user User.User
+
+	msgErr := json.Unmarshal([]byte(Msg.GetUserMessagesList(userid)), &message)
+	if msgErr != nil {
+		data.ErrorMsg = msgErr.Error()
+	} else {
+		userErr := json.Unmarshal([]byte(User.GetUserById(userid)), &user)
+		if userErr != nil {
+			data.ErrorMsg = userErr.Error()
+		} else {
+			data.ErrorMsg = "All is Well"
+		}
+	}
+
+	if data.GetErrorMessage() == "All is Well" {
+		resData.Message = message
+		resData.PostedBy = user
+		data.ErrorMsg = "All is well"
+		data.Status = "200"
+		data.Success = true
+		jsonRes, _ := json.Marshal(resData)
+		data.JsonData = jsonRes
+		serv.ResponseBuilder().SetResponseCode(200)
+	} else {
+		data.Status = "400"
+		data.Success = false
+		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+	}
+
+	return string(data.ToString())
 }
 
 func (serv UserService) GetAll() string {
