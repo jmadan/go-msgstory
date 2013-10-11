@@ -55,7 +55,6 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 			"msg_text":   msg.MsgText,
 			"user_id":    msg.UserId,
 			"created_on": msg.CreatedOn,
-			"user":       msg.User,
 		}}})
 
 	if err != nil {
