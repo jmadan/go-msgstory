@@ -55,7 +55,7 @@ type MsgService struct {
 	saveMessage     gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
 	getMessage      gorest.EndPoint `method:"GET" path:"/{msgId:string}" output:"string"`
 	getMessages     gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
-	getUserMessages gorest.EndPoint `method:"GET" path:"/messages/user/{userid:string}" output:"string"`
+	getUserMessages gorest.EndPoint `method:"GET" path:"/user/{userid:string}" output:"string"`
 }
 
 type AuthenticateService struct {
