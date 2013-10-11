@@ -251,25 +251,20 @@ func (serv MsgService) GetUserMessages(userid string) string {
 			err = json.Unmarshal([]byte(response), &user)
 			if err != nil {
 				data.ErrorMsg = err.Error()
+				data.Status = "400"
+				data.Success = false
+				serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 			} else {
-				data.ErrorMsg = "All is Well"
+				resData.Message = message
+				resData.PostedBy = user
+				data.ErrorMsg = "All is well"
+				data.Status = "200"
+				data.Success = true
+				jsonRes, _ := json.Marshal(resData)
+				data.JsonData = jsonRes
+				serv.ResponseBuilder().SetResponseCode(200)
 			}
 		}
-	}
-
-	if data.GetErrorMessage() == "All is Well" {
-		resData.Message = message
-		resData.PostedBy = user
-		data.ErrorMsg = "All is well"
-		data.Status = "200"
-		data.Success = true
-		jsonRes, _ := json.Marshal(resData)
-		data.JsonData = jsonRes
-		serv.ResponseBuilder().SetResponseCode(200)
-	} else {
-		data.Status = "400"
-		data.Success = false
-		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
 
 	return string(data.ToString())
