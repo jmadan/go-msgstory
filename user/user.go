@@ -3,10 +3,10 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	_ "github.com/go-sql-driver/mysql"
 	Connection "github.com/jmadan/go-msgstory/connection"
-	Message "github.com/jmadan/go-msgstory/message"
+	// Message "github.com/jmadan/go-msgstory/message"
 	RD "github.com/jmadan/go-msgstory/util"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -23,13 +23,13 @@ type User struct {
 	Email       string        `json:"email" bson:"email"`
 	Handle      string        `json:"handle" bson:"handle"`
 	PhoneNumber string        `json:"phone" bson:"phone"`
-	Relations   rels          `json:"relations" bson:"relations"`
-	Created_on  time.Time     `json:"created_on" bson:"created_on"`
+	// Relations   rels          `json:"relations" bson:"relations"`
+	Created_on time.Time `json:"created_on" bson:"created_on"`
 }
 
-type rels struct {
-	Messages []Message.Message `json:"messages" bson:"messages"`
-}
+// type rels struct {
+// 	Messages []Message.Message `json:"messages" bson:"messages"`
+// }
 
 func (u *User) SetEmail(email string) {
 	u.Email = email
@@ -51,13 +51,13 @@ func (u *User) GetHandle() string {
 	return u.Handle
 }
 
-func (u *User) GetMessages() string {
-	str, err := json.Marshal(u.Relations.Messages)
-	if err != nil {
-		fmt.Println("what the fuck!")
-	}
-	return string(str)
-}
+// func (u *User) GetMessages() string {
+// 	str, err := json.Marshal(u.Relations.Messages)
+// 	if err != nil {
+// 		fmt.Println("what the fuck!")
+// 	}
+// 	return string(str)
+// }
 
 func (u *User) GetUser() string {
 	dbSession := Connection.GetDBSession()
@@ -207,7 +207,7 @@ func GetUserByEmail(user_email string) string {
 	return uid
 }
 
-func GetUserById(user_id string) string {
+func GetUserById(user_id string) (string, error) {
 	var response string
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
@@ -218,7 +218,6 @@ func GetUserById(user_id string) string {
 	err := c.Find(bson.M{"_id": bson.ObjectIdHex(user_id)}).One(&result)
 	if err != nil {
 		log.Println(err)
-		response = err.Error()
 		// returnData.ErrorMsg = err.Error()
 		// returnData.Status = "400"
 		// returnData.Success = false
@@ -231,5 +230,5 @@ func GetUserById(user_id string) string {
 		log.Println(response)
 		// returnData.JsonData = jsonRes
 	}
-	return response
+	return response, err
 }
