@@ -207,7 +207,8 @@ func GetUserByEmail(user_email string) string {
 	return uid
 }
 
-func GetUserById(user_id string) (returnData RD.ReturnData) {
+func GetUserById(user_id string) string {
+	var response string
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
@@ -217,16 +218,18 @@ func GetUserById(user_id string) (returnData RD.ReturnData) {
 	err := c.Find(bson.M{"_id": bson.ObjectIdHex(user_id)}).One(&result)
 	if err != nil {
 		log.Println(err)
-		returnData.ErrorMsg = err.Error()
-		returnData.Status = "400"
-		returnData.Success = false
+		response = err.Error()
+		// returnData.ErrorMsg = err.Error()
+		// returnData.Status = "400"
+		// returnData.Success = false
 	} else {
 		log.Println(result)
-		returnData.ErrorMsg = "All is well"
-		returnData.Status = "200"
-		returnData.Success = true
-		jsonRes, _ := json.Marshal(result)
-		returnData.JsonData = jsonRes
+		// returnData.ErrorMsg = "All is well"
+		// returnData.Status = "200"
+		// returnData.Success = true
+		response, _ := json.Marshal(result)
+		log.Println(response)
+		// returnData.JsonData = jsonRes
 	}
-	return returnData
+	return response
 }
