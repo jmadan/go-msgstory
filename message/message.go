@@ -3,6 +3,7 @@ package message
 import (
 	"encoding/json"
 	Connection "github.com/jmadan/go-msgstory/connection"
+	User "github.com/jmadan/go-msgstory/user"
 	RD "github.com/jmadan/go-msgstory/util"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -17,6 +18,7 @@ type Message struct {
 	MsgText   string        `json:"msg_text" bson:"msg_text"`
 	UserId    string        `json:"user_id" bson:"user_id"`
 	CreatedOn time.Time     `json:"created_on" bson:"created_on"`
+	User      User.User     `json:"user" bson:"user"`
 }
 
 type Messages struct {
@@ -53,6 +55,7 @@ func (msg *Message) SaveMessage(conversationId string) RD.ReturnData {
 			"msg_text":   msg.MsgText,
 			"user_id":    msg.UserId,
 			"created_on": msg.CreatedOn,
+			"user":       msg.User,
 		}}})
 
 	if err != nil {
@@ -92,4 +95,57 @@ func GetMessages(conversationId string) RD.ReturnData {
 		returnData.Status = "201"
 	}
 	return returnData
+}
+
+func GetUserMessages(userId string) RD.ReturnData {
+	returnData := RD.ReturnData{}
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
+
+	Msgs := []Message{}
+	m := Messages{}
+	err := c.Find(bson.M{"messages.user_id": bson.ObjectIdHex(userId)}).Select(bson.M{"messages": 1}).One(&m)
+	if err != nil {
+		log.Println(err.Error())
+		returnData.ErrorMsg = err.Error()
+		returnData.Success = false
+		returnData.Status = "422"
+	} else {
+		log.Println(Msgs)
+		jsonData, _ := json.Marshal(&m)
+		returnData.Success = true
+		returnData.JsonData = jsonData
+		returnData.Status = "201"
+	}
+	return returnData
+}
+
+func GetUserMessagesList(userId string) string {
+	var response string
+	dbSession := Connection.GetDBSession()
+	dbSession.SetMode(mgo.Monotonic, true)
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
+
+	Msgs := []Message{}
+	m := Messages{}
+	err := c.Find(bson.M{"messages.user_id": bson.ObjectIdHex(userId)}).Select(bson.M{"messages": 1}).One(&m)
+
+	if err != nil {
+		log.Println(err.Error())
+		response = err.Error()
+		// 	returnData.ErrorMsg = err.Error()
+		// 	returnData.Success = false
+		// 	returnData.Status = "422"
+	} else {
+		log.Println(Msgs)
+		response, _ := json.Marshal(&m)
+		// 	returnData.Success = true
+		// 	returnData.JsonData = jsonData
+		// 	returnData.Status = "201"
+		log.Println(response)
+	}
+	return response
 }
