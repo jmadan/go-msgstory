@@ -23,13 +23,22 @@ type User struct {
 	Email       string        `json:"email" bson:"email"`
 	Handle      string        `json:"handle" bson:"handle"`
 	PhoneNumber string        `json:"phone" bson:"phone"`
+	CreatedOn   time.Time     `json:"created_on" bson:"created_on"`
 	// Relations   rels          `json:"relations" bson:"relations"`
-	Created_on time.Time `json:"created_on" bson:"created_on"`
 }
 
 // type rels struct {
 // 	Messages []Message.Message `json:"messages" bson:"messages"`
 // }
+
+func (U *User) UserToJSON() string {
+	userJSON, err := json.Marshal(&U)
+	if err != nil {
+		log.Fatal(err.Error())
+		userJSON = []byte("Error")
+	}
+	return string(userJSON)
+}
 
 func (u *User) SetEmail(email string) {
 	u.Email = email
@@ -126,7 +135,7 @@ func (u *User) CreateUser() RD.ReturnData {
 	c := dbSession.DB(dataBase[3]).C("jove")
 
 	u.Id = bson.NewObjectId()
-	u.Created_on = time.Now()
+	u.CreatedOn = time.Now()
 
 	err := c.Insert(u)
 	if err != nil {
@@ -208,7 +217,6 @@ func GetUserByEmail(user_email string) string {
 }
 
 func GetUserById(user_id string) (string, error) {
-	var response string
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
@@ -216,19 +224,5 @@ func GetUserById(user_id string) (string, error) {
 
 	result := User{}
 	err := c.Find(bson.M{"_id": bson.ObjectIdHex(user_id)}).One(&result)
-	if err != nil {
-		log.Println(err)
-		// returnData.ErrorMsg = err.Error()
-		// returnData.Status = "400"
-		// returnData.Success = false
-	} else {
-		log.Println(result)
-		// returnData.ErrorMsg = "All is well"
-		// returnData.Status = "200"
-		// returnData.Success = true
-		response, _ := json.Marshal(result)
-		log.Println(response)
-		// returnData.JsonData = jsonRes
-	}
-	return response, err
+	return result.UserToJSON(), err
 }

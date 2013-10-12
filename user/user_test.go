@@ -1,11 +1,21 @@
 package user
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	// "labix.org/v2/mgo/bson"
+	"fmt"
 	"testing"
-	// "time"
+	"time"
 )
+
+var user = User{
+	UserId:      11,
+	Name:        "Jasdeep",
+	Email:       "jasdeepm@gmail.com",
+	Handle:      "JD",
+	PhoneNumber: "",
+	CreatedOn:   time.Now(),
+}
 
 func Test_CreatePerson(t *testing.T) {
 	user := User{}
@@ -65,11 +75,21 @@ func Test_CreateUserLogin(t *testing.T) {
 	}
 }
 
-func Test_GetUserById(t *testing.T) {
-	res := GetUserById("51b8e5b62ffc2c5db5e9b213")
-	if res.Success {
-		t.Log("PASSED")
+func Test_UserJSON(t *testing.T) {
+	var str = user.UserToJSON()
+	if str != "Error" {
+		t.Log("Test_UserJSON PASSED")
 	} else {
 		t.Fail()
+	}
+}
+
+func Test_GetUserById(t *testing.T) {
+	res, err := GetUserById("51b8e5b62ffc2c5db5e9b213")
+	if err != nil {
+		t.Fail()
+	} else {
+		fmt.Println(res)
+		t.Log("PASSED")
 	}
 }
