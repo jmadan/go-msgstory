@@ -123,7 +123,7 @@ func GetUserMessages(userId string) RD.ReturnData {
 	return returnData
 }
 
-func GetUserMessageList(userId string) (string, error) {
+func GetUserMessagesList(userId string) (string, error) {
 	var response []byte
 	dbSession := Connection.GetDBSession()
 	dbSession.SetMode(mgo.Monotonic, true)
