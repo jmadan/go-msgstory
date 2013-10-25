@@ -91,32 +91,32 @@ func GetConversationsForLocation(locationId string) ([]byte, error) {
 	return response, err
 }
 
-// func GetConversation(conversationId string) (returnData RD.ReturnData) {
-// 	fmt.Println(conversationId)
-// 	dbSession := Connection.GetDBSession()
-// 	// dbSession.SetMode(mgo.Monotonic, true)
-// 	defer dbSession.Close()
-// 	log.Println(os.Getenv("MONGOHQ_URL"))
-// 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
-// 	c := dbSession.DB(dataBase[3]).C("conversation")
-// 	res := Conversation{}
-// 	// err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
-// 	err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).One(&res)
-// 	if err != nil {
-// 		log.Println(err)
-// 		returnData.ErrorMsg = err.Error()
-// 		returnData.Status = "400"
-// 		returnData.Success = false
-// 	} else {
-// 		log.Println(res)
-// 		returnData.ErrorMsg = "All is well"
-// 		returnData.Status = "200"
-// 		returnData.Success = true
-// 		jsonRes, _ := json.Marshal(res)
-// 		returnData.JsonData = jsonRes
-// 	}
-// 	return
-// }
+func GetConversation(conversationId string) (returnData RD.ReturnData) {
+	fmt.Println(conversationId)
+	dbSession := Connection.GetDBSession()
+	// dbSession.SetMode(mgo.Monotonic, true)
+	defer dbSession.Close()
+	log.Println(os.Getenv("MONGOHQ_URL"))
+	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
+	c := dbSession.DB(dataBase[3]).C("conversation")
+	res := Conversation{}
+	// err := c.FindId(bson.ObjectIdHex(conversationId)).One(&res)
+	err := c.Find(bson.M{"_id": bson.ObjectIdHex(conversationId)}).One(&res)
+	if err != nil {
+		log.Println(err)
+		returnData.ErrorMsg = err.Error()
+		returnData.Status = "400"
+		returnData.Success = false
+	} else {
+		log.Println(res)
+		returnData.ErrorMsg = "All is well"
+		returnData.Status = "200"
+		returnData.Success = true
+		jsonRes, _ := json.Marshal(res)
+		returnData.JsonData = jsonRes
+	}
+	return
+}
 
 func DeleteConversation(conversationId string) RD.ReturnData {
 	returnData := RD.ReturnData{}
