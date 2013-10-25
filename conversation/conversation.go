@@ -3,7 +3,7 @@ package conversation
 import (
 	"encoding/json"
 	// SJ "github.com/bitly/go-simplejson"
-	// "fmt"
+	"fmt"
 	Group "github.com/jmadan/go-msgstory/circle"
 	Connection "github.com/jmadan/go-msgstory/connection"
 	Location "github.com/jmadan/go-msgstory/geolocation"
