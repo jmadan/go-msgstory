@@ -130,17 +130,13 @@ func GetUserMessagesList(userId string) (string, error) {
 	dataBase := strings.SplitAfter(os.Getenv("MONGOHQ_URL"), "/")
 	c := dbSession.DB(dataBase[3]).C("conversation")
 
-	Msgs := Messages{}
-	err := c.Find(bson.M{"messages.user_id": userId}).Select(bson.M{"messages": 1}).One(&Msgs)
+	Msgs := []Messages{}
+	err := c.Find(bson.M{"messages.user_id": userId}).Select(bson.M{"messages": 1}).All(&Msgs)
 	if err != nil {
 	} else {
 		response, err = json.Marshal(Msgs)
 	}
 	log.Println(string(response))
-	// log.Println(err.Error() + "-----------" + Msgs[0].MsgToJSON())
-	// if err == nil {
-	// response, err = json.Marshal(Msgs)
-	// }
 
 	return string(response), err
 }

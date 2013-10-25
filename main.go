@@ -7,6 +7,7 @@ import (
 	Authenticate "github.com/jmadan/go-msgstory/authenticate"
 	Circle "github.com/jmadan/go-msgstory/circle"
 	Conversation "github.com/jmadan/go-msgstory/conversation"
+	// Dialogue "github.com/jmadan/go-msgstory/dialogue"
 	Glocation "github.com/jmadan/go-msgstory/geolocation"
 	Msg "github.com/jmadan/go-msgstory/message"
 	Register "github.com/jmadan/go-msgstory/register"
@@ -52,10 +53,9 @@ type ConversationService struct {
 type MsgService struct {
 	gorest.RestService `root:"/api/message/" consumes:"application/json" produces:"application/json"`
 
-	saveMessage     gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
-	getMessage      gorest.EndPoint `method:"GET" path:"/{msgId:string}" output:"string"`
-	getMessages     gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
-	getUserMessages gorest.EndPoint `method:"GET" path:"/all/user/{userid:string}" output:"string"`
+	saveMessage gorest.EndPoint `method:"POST" path:"/conversation/{convoId:string}/" postdata:"string"`
+	getMessage  gorest.EndPoint `method:"GET" path:"/{msgId:string}" output:"string"`
+	getMessages gorest.EndPoint `method:"GET" path:"/conversation/{convoId:string}" output:"string"`
 }
 
 type AuthenticateService struct {
@@ -104,12 +104,19 @@ func (serv ConversationService) CreateConversation(posted string) {
 
 func (serv ConversationService) GetConversationsForLocation(locationId string) string {
 	var data ReturnData.ReturnData
-	data = Conversation.GetConversationsForLocation(locationId)
-	if data.Success {
-		serv.ResponseBuilder().SetResponseCode(200)
-	} else {
+	response, err := Conversation.GetConversationsForLocation(locationId)
+	if err != nil {
+		data.ErrorMsg = err.Error()
+		data.Status = "400"
+		data.Success = false
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
+	} else {
+		data.Status = "200"
+		data.Success = true
+		data.JsonData = response
+		serv.ResponseBuilder().SetResponseCode(200)
 	}
+
 	return string(data.ToString())
 }
 
@@ -230,44 +237,6 @@ func (serv MsgService) SaveMessage(posted, convoId string) {
 	} else {
 		serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
 	}
-
-}
-
-func (serv MsgService) GetUserMessages(userid string) string {
-	var data ReturnData.ReturnData
-	var resData CompositeMsg
-	var message Msg.Message
-	var user User.User
-
-	msgErr := json.Unmarshal([]byte(Msg.GetUserMessagesList(userid)), &message)
-	if msgErr != nil {
-		data.ErrorMsg = msgErr.Error()
-	} else {
-		response, err := User.GetUserById(userid)
-		// userErr := json.Unmarshal([]byte(User.GetUserById(userid)), &user)
-		if err != nil {
-			data.ErrorMsg = err.Error()
-		} else {
-			err = json.Unmarshal([]byte(response), &user)
-			if err != nil {
-				data.ErrorMsg = err.Error()
-				data.Status = "400"
-				data.Success = false
-				serv.ResponseBuilder().SetResponseCode(400).WriteAndOveride([]byte(data.ToString()))
-			} else {
-				resData.Message = message
-				resData.PostedBy = user
-				data.ErrorMsg = "All is well"
-				data.Status = "200"
-				data.Success = true
-				jsonRes, _ := json.Marshal(resData)
-				data.JsonData = jsonRes
-				serv.ResponseBuilder().SetResponseCode(200)
-			}
-		}
-	}
-
-	return string(data.ToString())
 }
 
 //*************User Service Methods ***************
