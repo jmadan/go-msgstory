@@ -243,10 +243,11 @@ func (serv MsgService) SaveMessage(posted, convoId string) {
 func (serv UserService) RegisterUser(posted string) {
 
 	type newUser struct {
-		Name     string `json:"name" bson:"name"`
-		Email    string `json:"email" bson:"email"`
-		Handle   string `json:"handle" bson:"handle"`
-		Password string `json:"password" bson:"password"`
+		Name        string `json:"name" bson:"name"`
+		Email       string `json:"email" bson:"email"`
+		Handle      string `json:"handle" bson:"handle"`
+		Password    string `json:"password" bson:"password"`
+		PhoneNumber string `json:"phone" bson:"phone"`
 	}
 
 	var data ReturnData.ReturnData
@@ -266,6 +267,7 @@ func (serv UserService) RegisterUser(posted string) {
 		user.Name = tempUser.Name
 		user.Email = tempUser.Email
 		user.Handle = tempUser.Handle
+		user.PhoneNumber = tempUser.PhoneNumber
 		data = user.CreateUser()
 	}
 	if data.Success {
