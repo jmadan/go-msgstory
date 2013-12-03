@@ -7,6 +7,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	Connection "github.com/jmadan/go-msgstory/connection"
 	// Message "github.com/jmadan/go-msgstory/message"
+	"crypto/sha256"
+	"encoding/hex"
 	RD "github.com/jmadan/go-msgstory/util"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -161,6 +163,9 @@ func CreateUserLogin(useremail, password string) string {
 	}
 	defer db.Close()
 
+	hasher := sha256.New()
+	hasher.Write([]byte(password))
+
 	stmtIns, err := db.Prepare("INSERT INTO USERS (USEREMAIL,PASSWORD) VALUES (?,?)")
 	if err != nil {
 		log.Fatal("stmtError :" + err.Error())
@@ -168,7 +173,7 @@ func CreateUserLogin(useremail, password string) string {
 	defer stmtIns.Close()
 
 	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
-	_, err = stmtIns.Exec(useremail, password)
+	_, err = stmtIns.Exec(useremail, hex.EncodeToString(hasher.Sum(nil))
 	if err != nil {
 		log.Print("stmtExecution: " + err.Error())
 	}
