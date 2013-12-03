@@ -173,7 +173,7 @@ func CreateUserLogin(useremail, password string) string {
 	defer stmtIns.Close()
 
 	// err = stmtOut.QueryRow(useremail, userpassword).Scan(&authorize.user_id, &authorize.email)
-	_, err = stmtIns.Exec(useremail, hex.EncodeToString(hasher.Sum(nil))
+	_, err = stmtIns.Exec(useremail, hex.EncodeToString(hasher.Sum(nil)))
 	if err != nil {
 		log.Print("stmtExecution: " + err.Error())
 	}
