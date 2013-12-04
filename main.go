@@ -316,7 +316,7 @@ func (serv AppService) GetApp() string {
 	return m
 }
 
-func (serv AppService) ResetPassword(posted string) string {
+func (serv AppService) ResetPassword(posted string) {
 	type newUser struct {
 		Name        string `json:"name" bson:"name"`
 		Email       string `json:"email" bson:"email"`
@@ -331,8 +331,6 @@ func (serv AppService) ResetPassword(posted string) string {
 	} else {
 		fmt.Println(user.UserToJSON())
 	}
-
-	return "hello"
 }
 
 func getData(w http.ResponseWriter, r *http.Request) {
