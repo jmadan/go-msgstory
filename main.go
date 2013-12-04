@@ -28,8 +28,8 @@ type CompositeMsg struct {
 type AppService struct {
 	gorest.RestService `root:"/api/" consumes:"application/json" produces:"application/json"`
 
-	getApp       gorest.EndPoint `method:"GET" path:"/" output:"string"`
-	restPassword gorest.EndPoint `method:"POST" path:"/forgot" postdata:"string"`
+	getApp        gorest.EndPoint `method:"GET" path:"/" output:"string"`
+	resetPassword gorest.EndPoint `method:"POST" path:"/forgot" postdata:"string"`
 }
 
 type UserService struct {
