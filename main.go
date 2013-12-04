@@ -28,7 +28,8 @@ type CompositeMsg struct {
 type AppService struct {
 	gorest.RestService `root:"/api/" consumes:"application/json" produces:"application/json"`
 
-	getApp gorest.EndPoint `method:"GET" path:"/" output:"string"`
+	getApp       gorest.EndPoint `method:"GET" path:"/" output:"string"`
+	restPassword gorest.EndPoint `method:"POST" path:"/forgot" postdata:"string"`
 }
 
 type UserService struct {
@@ -313,6 +314,25 @@ func (serv UserService) GetAll() string {
 func (serv AppService) GetApp() string {
 	m := "{\"Message\": \"Welcome to Mesiji\"}"
 	return m
+}
+
+func (serv AppService) ResetPassword(posted string) string {
+	type newUser struct {
+		Name        string `json:"name" bson:"name"`
+		Email       string `json:"email" bson:"email"`
+		Handle      string `json:"handle" bson:"handle"`
+		Password    string `json:"password" bson:"password"`
+		PhoneNumber string `json:"phone" bson:"phone"`
+	}
+	user := User.User{}
+	err := json.Unmarshal([]byte(posted), &user)
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println(user.UserToJSON())
+	}
+
+	return "hello"
 }
 
 func getData(w http.ResponseWriter, r *http.Request) {
