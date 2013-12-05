@@ -317,13 +317,7 @@ func (serv AppService) GetApp() string {
 }
 
 func (serv AppService) ResetPassword(posted string) {
-	type newUser struct {
-		Name        string `json:"name" bson:"name"`
-		Email       string `json:"email" bson:"email"`
-		Handle      string `json:"handle" bson:"handle"`
-		Password    string `json:"password" bson:"password"`
-		PhoneNumber string `json:"phone" bson:"phone"`
-	}
+
 	user := User.User{}
 	err := json.Unmarshal([]byte(posted), &user)
 	if err != nil {
@@ -331,6 +325,17 @@ func (serv AppService) ResetPassword(posted string) {
 	} else {
 		fmt.Println(user.UserToJSON())
 	}
+	userid := User.GetUserByEmail(user.Email)
+	uuid, err := ReturnData.GenUUID()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	emailBody := "<p>Please click on the following link to reset your password. <a href=\"http://www.happenstance.me/reset/"
+	emailBody += userid + "/"
+	emailBody += uuid
+	emailBody += "\"></p>"
+	ReturnData.SendCustomMail(emailBody, "no-reply@happenstance.me", user.GetEmail(), "Reset Password @ happenStance.Me")
 }
 
 func getData(w http.ResponseWriter, r *http.Request) {
